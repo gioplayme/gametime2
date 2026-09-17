@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameTime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060a; --bg-2:#0a0a0f; --panel:rgba(20,20,27,.72); --panel-solid:#14141b;
+  --glass:rgba(255,255,255,.035); --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.16);
+  --red:#ff2740; --red-2:#ff5c6e; --red-soft:rgba(255,39,64,.13);
+  --text:#f4f4f7; --muted:#9c9cab; --muted-2:#6c6c7b; --gold:#ffc65c;
+  --r:16px; --shadow:0 18px 40px -24px #000;
+  --glow:0 0 0 1px rgba(255,39,64,.45), 0 22px 60px -26px rgba(255,39,64,.65);
+  --ease:cubic-bezier(.2,.8,.24,1);
+  --font-ui:"Chakra Petch","Noto Sans Georgian",system-ui,sans-serif;
+  --font-body:"Barlow","Noto Sans Georgian",system-ui,sans-serif;
+}
+:root:not([data-theme="light"]){color-scheme:dark;}
+html[lang="ka"]{--font-ui:"Noto Sans Georgian",system-ui,sans-serif;--font-body:"Noto Sans Georgian",system-ui,sans-serif;}
+html[lang="ka"] body{letter-spacing:0;}
+html[lang="ka"] h1,html[lang="ka"] h2,html[lang="ka"] h3,html[lang="ka"] .btn,html[lang="ka"] .chip{letter-spacing:0;}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:0;}
+h1,h2,h3,h4{margin:0;line-height:1.15;font-family:var(--font-ui);font-weight:700;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;font-family:var(--font-ui);}
+input,select,textarea{font-family:var(--font-body);}
+img{max-width:100%;display:block;}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:8px;}
+::selection{background:var(--red);color:#fff;}
+.wrap{width:min(1280px,100% - 40px);margin-inline:auto;}
+@media(max-width:640px){.wrap{width:min(1280px,100% - 26px);}}
+.glass{background:var(--panel);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);}
+
+/* header */
+.topbar{position:sticky;top:0;z-index:70;background:rgba(6,6,10,.8);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);}
+.topbar-in{display:flex;align-items:center;gap:18px;height:68px;}
+.logo{display:flex;align-items:center;gap:9px;flex:0 0 auto;}
+.logo-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;flex:0 0 auto;
+  background:linear-gradient(150deg,#22222d,#0c0c11);border:1px solid rgba(255,39,64,.55);
+  box-shadow:inset 0 0 20px -6px rgba(255,39,64,.8),0 0 18px -8px rgba(255,39,64,.9);}
+.logo-mark svg{width:19px;height:19px;fill:var(--red);}
+.logo-txt{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:.11em;}
+.logo-txt span{color:var(--red);text-shadow:0 0 18px rgba(255,39,64,.8);}
+.nav{display:flex;gap:2px;margin-left:8px;}
+.nav button{padding:9px 13px;border-radius:10px;font-weight:600;font-size:.93rem;color:var(--muted);transition:.18s;}
+.nav button:hover{color:var(--text);background:var(--glass);}
+.nav button[aria-current="page"]{color:var(--text);background:var(--red-soft);box-shadow:inset 0 0 0 1px rgba(255,39,64,.38);}
+.spacer{margin-left:auto;}
+.searchbox{position:relative;flex:1 1 240px;max-width:300px;}
+.searchbox input{width:100%;background:#0e0e14;border:1px solid var(--line);color:var(--text);border-radius:12px;
+  padding:10px 12px 10px 36px;font-size:.92rem;transition:.2s;}
+.searchbox input::placeholder{color:var(--muted-2);}
+.searchbox input:focus{outline:none;border-color:rgba(255,39,64,.65);box-shadow:0 0 0 3px rgba(255,39,64,.12);}
+.searchbox svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;fill:var(--muted-2);}
+.lang{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:0 0 auto;}
+.lang button{padding:7px 11px;font-size:.84rem;font-weight:600;color:var(--muted-2);transition:.18s;}
+.lang button[aria-pressed="true"]{background:var(--red-soft);color:var(--red-2);box-shadow:inset 0 0 0 1px rgba(255,39,64,.35);}
+.lang button:hover{color:var(--text);}
+.bell{position:relative;width:38px;height:38px;border-radius:11px;border:1px solid var(--line);display:grid;place-items:center;}
+.bell svg{width:17px;height:17px;fill:var(--muted);}
+.bell:hover{border-color:rgba(255,39,64,.5);}
+.bell b{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:var(--red);
+  color:#fff;font-size:.68rem;display:grid;place-items:center;padding:0 5px;font-family:var(--font-ui);}
+.avatar{border-radius:11px;display:grid;place-items:center;font-family:"Chakra Petch",sans-serif;font-weight:700;
+  color:#08080b;flex:0 0 auto;width:34px;height:34px;font-size:.85rem;}
+.avatar.sm{width:28px;height:28px;border-radius:9px;font-size:.72rem;}
+.avatar.lg{width:72px;height:72px;border-radius:20px;font-size:1.7rem;}
+.userchip{display:flex;align-items:center;gap:8px;padding:4px 11px 4px 4px;border-radius:12px;border:1px solid var(--line);background:#0e0e14;}
+.userchip:hover{border-color:rgba(255,39,64,.5);}
+.userchip b{font-family:var(--font-ui);font-weight:600;font-size:.89rem;}
+.burger{display:none;width:38px;height:38px;border-radius:11px;border:1px solid var(--line);place-items:center;}
+.burger svg{width:19px;height:19px;fill:var(--text);}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:12px;
+  font-weight:600;font-size:.93rem;border:1px solid var(--line-2);background:#16161e;color:var(--text);
+  transition:transform .12s var(--ease),background .2s,border-color .2s,box-shadow .25s;}
+.btn:hover{background:#1e1e28;}
+.btn:active{transform:translateY(1px) scale(.985);}
+.btn svg{width:15px;height:15px;fill:currentColor;}
+.btn-red{background:linear-gradient(180deg,#ff3149,#d0122b);border-color:#ff4a5f;color:#fff;box-shadow:0 12px 30px -16px rgba(255,39,64,.95);}
+.btn-red:hover{background:linear-gradient(180deg,#ff475c,#e21532);box-shadow:0 16px 36px -14px rgba(255,39,64,1);}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--muted);}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,39,64,.45);background:var(--red-soft);}
+.btn-lg{padding:15px 28px;font-size:1rem;border-radius:14px;}
+.btn-sm{padding:7px 12px;font-size:.84rem;border-radius:10px;}
+.btn-danger{color:#ff97a3;border-color:rgba(255,39,64,.32);}
+.btn-danger:hover{background:rgba(255,39,64,.16);color:#fff;border-color:var(--red);}
+.btn-ok{color:#8ff0bb;border-color:rgba(61,220,132,.3);}
+.btn-ok:hover{background:rgba(61,220,132,.14);color:#fff;border-color:#3ddc84;}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);}
+.hero-bg{position:absolute;inset:0;pointer-events:none;}
+.hero-bg .aur{position:absolute;border-radius:50%;filter:blur(30px);}
+.hero-bg .a1{width:760px;height:760px;left:-200px;top:-360px;background:radial-gradient(circle,rgba(255,39,64,.34),transparent 62%);animation:drift 18s ease-in-out infinite alternate;}
+.hero-bg .a2{width:620px;height:620px;right:-180px;bottom:-320px;background:radial-gradient(circle,rgba(255,39,64,.2),transparent 65%);animation:drift 22s ease-in-out infinite alternate-reverse;}
+@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(60px,40px,0)}}
+.hero-bg .grid{position:absolute;inset:0;opacity:.45;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 78% 68% at 50% 22%,#000 28%,transparent 76%);
+  -webkit-mask-image:radial-gradient(ellipse 78% 68% at 50% 22%,#000 28%,transparent 76%);}
+.hero-bg .beam{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:beam 8s var(--ease) infinite;}
+@keyframes beam{0%{transform:translateY(0);opacity:0}10%{opacity:.6}72%{transform:translateY(440px);opacity:0}100%{transform:translateY(440px);opacity:0}}
+.hero-in{position:relative;padding:92px 0 80px;display:grid;gap:26px;max-width:800px;}
+.hero h1{font-size:clamp(2.4rem,7vw,5rem);letter-spacing:-.01em;text-shadow:0 0 50px rgba(255,39,64,.3);}
+.hero h1 i{color:var(--red);font-style:normal;}
+.hero p{margin:0;font-size:clamp(1.02rem,2.1vw,1.24rem);color:var(--muted);max-width:52ch;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.stats{display:flex;gap:34px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--line);}
+.stats b{display:block;font-family:var(--font-ui);font-size:1.7rem;line-height:1.2;}
+.stats small{color:var(--muted-2);font-size:.82rem;}
+
+/* sections */
+.section{padding:52px 0;}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+.section-head h2{font-size:1.5rem;display:flex;align-items:center;gap:11px;}
+.section-head h2 i{width:8px;height:22px;border-radius:3px;background:var(--red);box-shadow:0 0 18px rgba(255,39,64,.9);flex:0 0 auto;}
+.section-head p{margin:5px 0 0;color:var(--muted);font-size:.93rem;}
+.grid-games{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:20px;}
+
+/* card */
+.card{position:relative;display:flex;flex-direction:column;border-radius:var(--r);overflow:hidden;
+  background:linear-gradient(180deg,rgba(24,24,32,.9),rgba(12,12,17,.95));border:1px solid var(--line);
+  box-shadow:var(--shadow);transition:transform .26s var(--ease),border-color .26s,box-shadow .3s;}
+.card:hover{transform:translateY(-5px);border-color:rgba(255,39,64,.5);box-shadow:var(--glow);}
+.card:hover .cover img{transform:scale(1.06);}
+.card.featured{border-color:rgba(255,39,64,.5);box-shadow:0 0 0 1px rgba(255,39,64,.3),0 22px 54px -28px rgba(255,39,64,.8);}
+.cover{position:relative;aspect-ratio:16/9;overflow:hidden;background:#09090d;cursor:pointer;}
+.cover img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease);position:absolute;inset:0;}
+.cover .fb{position:absolute;inset:0;display:grid;place-items:center;}
+.cover .fb span{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:2.3rem;letter-spacing:.12em;color:rgba(255,255,255,.92);text-shadow:0 2px 24px rgba(0,0,0,.7);}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(6,6,10,.9));pointer-events:none;}
+.pill{position:absolute;z-index:2;padding:4px 10px;border-radius:8px;font-family:var(--font-ui);font-weight:600;
+  font-size:.72rem;background:rgba(6,6,10,.8);backdrop-filter:blur(6px);border:1px solid var(--line-2);color:var(--muted);}
+.pill.cat{left:11px;top:11px;border-color:rgba(255,39,64,.45);color:#ff97a3;}
+.pill.feat{right:11px;top:11px;border-color:rgba(255,198,92,.5);color:var(--gold);}
+.pill.pend{right:11px;top:11px;border-color:rgba(255,198,92,.5);color:var(--gold);}
+.card-body{padding:15px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1;}
+.card-body h3{font-size:1.1rem;font-weight:600;cursor:pointer;transition:color .2s;}
+.card-body h3:hover{color:var(--red);}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted-2);font-size:.79rem;font-family:var(--font-ui);}
+.meta-row span{padding:2px 8px;border-radius:7px;background:var(--glass);border:1px solid var(--line);}
+.desc{margin:0;color:var(--muted);font-size:.9rem;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.byline{display:flex;align-items:center;gap:8px;color:var(--muted-2);font-size:.82rem;}
+.byline b{color:var(--muted);font-weight:500;cursor:pointer;}
+.byline b:hover{color:var(--red);}
+.card-foot{display:flex;align-items:center;gap:4px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line);}
+.act{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:10px;color:var(--muted);
+  font-size:.85rem;font-family:var(--font-ui);font-weight:600;transition:.18s;}
+.act:hover{color:var(--text);background:var(--glass);}
+.act svg{width:16px;height:16px;fill:currentColor;transition:transform .25s var(--ease);}
+.act.on{color:var(--red);}
+.act.on svg{filter:drop-shadow(0 0 8px rgba(255,39,64,.9));}
+.act.pop svg{animation:pop .42s var(--ease);}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+.push{margin-left:auto;}
+
+/* chips / tabs */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+.chip{padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:#0f0f15;color:var(--muted);
+  font-family:var(--font-ui);font-weight:600;font-size:.85rem;transition:.2s;}
+.chip:hover{color:var(--text);border-color:var(--line-2);}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 24px -8px rgba(255,39,64,.95);}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto;}
+.tabs button{padding:11px 15px;font-weight:600;font-size:.93rem;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:.2s;}
+.tabs button:hover{color:var(--text);}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--red);}
+
+/* forms */
+.form{display:grid;gap:16px;}
+.field{display:grid;gap:7px;}
+.field label{font-family:var(--font-ui);font-weight:600;font-size:.88rem;}
+.field small{color:var(--muted-2);font-size:.8rem;}
+.field input,.field select,.field textarea{background:#0c0c12;border:1px solid var(--line);color:var(--text);
+  border-radius:12px;padding:12px 14px;width:100%;font-size:.95rem;transition:.2s;}
+.field textarea{min-height:110px;resize:vertical;}
+.field select{font-family:var(--font-ui);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:rgba(255,39,64,.68);box-shadow:0 0 0 3px rgba(255,39,64,.12);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.row2,.row3{grid-template-columns:1fr;}}
+.err{color:#ff97a3;font-size:.88rem;min-height:1.2em;margin:0;}
+
+/* detail page */
+.banner{position:relative;aspect-ratio:21/8;border-radius:20px;overflow:hidden;background:#09090d;border:1px solid var(--line);}
+.banner img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.banner .fb{position:absolute;inset:0;display:grid;place-items:center;}
+.banner .fb span{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:clamp(2rem,7vw,4.5rem);letter-spacing:.14em;color:rgba(255,255,255,.93);}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(6,6,10,.95));}
+.detail-split{display:grid;grid-template-columns:1fr 330px;gap:24px;align-items:start;margin-top:26px;}
+@media(max-width:940px){.detail-split{grid-template-columns:1fr;}}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.shots div{aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#09090d;position:relative;}
+.shots img{width:100%;height:100%;object-fit:cover;}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.92rem;}
+.kv:last-child{border-bottom:none;}
+.kv span:first-child{color:var(--muted-2);font-family:var(--font-ui);}
+
+/* comments */
+.comment{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--line);}
+.comment:last-child{border-bottom:none;}
+.comment-main{flex:1;min-width:0;}
+.comment-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.comment-head b{font-family:var(--font-ui);font-size:.92rem;cursor:pointer;}
+.comment-head b:hover{color:var(--red);}
+.comment-head time{color:var(--muted-2);font-size:.79rem;}
+.comment p{margin:4px 0 6px;color:#d8d8e0;font-size:.94rem;overflow-wrap:anywhere;}
+
+/* community */
+.feed{display:grid;gap:16px;}
+.post{padding:18px;border-radius:var(--r);background:linear-gradient(180deg,rgba(22,22,30,.85),rgba(12,12,17,.9));
+  border:1px solid var(--line);transition:border-color .25s,transform .2s var(--ease);}
+.post:hover{border-color:rgba(255,39,64,.35);}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.ptype{padding:3px 10px;border-radius:8px;font-family:var(--font-ui);font-weight:600;font-size:.74rem;
+  background:var(--red-soft);color:#ff97a3;border:1px solid rgba(255,39,64,.32);}
+.post h3{font-size:1.14rem;margin-bottom:6px;}
+.post .body{color:#d0d0da;font-size:.95rem;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;}
+.post-foot{display:flex;gap:4px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap;}
+
+/* misc */
+.empty{border:1px dashed var(--line-2);border-radius:var(--r);padding:48px 24px;text-align:center;color:var(--muted);background:rgba(13,13,18,.6);}
+.empty h3{font-size:1.16rem;margin-bottom:8px;color:var(--text);}
+.empty p{margin:0 0 18px;font-size:.93rem;max-width:46ch;margin-inline:auto;}
+.note{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border-radius:12px;
+  background:rgba(255,39,64,.07);border:1px solid rgba(255,39,64,.26);color:#ffb8c2;font-size:.88rem;}
+.note svg{width:17px;height:17px;fill:var(--red);flex:0 0 auto;margin-top:3px;}
+.note.info{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--muted);}
+.note.info svg{fill:var(--muted);}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+.kpi{padding:18px;border-radius:14px;background:linear-gradient(160deg,rgba(255,39,64,.1),rgba(18,18,25,.9));border:1px solid var(--line);}
+.kpi b{display:block;font-family:var(--font-ui);font-size:2rem;line-height:1.1;}
+.kpi small{color:var(--muted-2);font-size:.82rem;}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem;}
+.tbl th{text-align:left;color:var(--muted-2);font-family:var(--font-ui);font-weight:600;font-size:.8rem;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.scrollx{overflow-x:auto;}
+.badge{display:inline-block;padding:2px 9px;border-radius:7px;font-size:.75rem;font-family:var(--font-ui);font-weight:600;}
+.badge.a{background:rgba(255,39,64,.18);color:#ff97a3;border:1px solid rgba(255,39,64,.4);}
+.badge.n{background:var(--glass);color:var(--muted);border:1px solid var(--line);}
+.badge.p{background:rgba(255,198,92,.14);color:var(--gold);border:1px solid rgba(255,198,92,.35);}
+.badge.r{background:rgba(255,39,64,.1);color:#ff97a3;border:1px solid rgba(255,39,64,.3);}
+.badge.o{background:rgba(61,220,132,.12);color:#8ff0bb;border:1px solid rgba(61,220,132,.3);}
+.linkrow{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;border:1px solid var(--line);
+  background:#0e0e14;transition:.2s;}
+.linkrow:hover{border-color:rgba(255,39,64,.5);background:#14141c;transform:translateX(3px);}
+.linkrow b{font-family:var(--font-ui);font-weight:600;font-size:.93rem;}
+.linkrow small{display:block;color:var(--muted-2);font-size:.8rem;}
+.linkrow svg{width:15px;height:15px;fill:var(--muted-2);margin-left:auto;flex:0 0 auto;}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+.catcard{padding:20px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(24,24,32,.9),rgba(11,11,16,.95));
+  text-align:left;transition:.24s var(--ease);}
+.catcard:hover{border-color:rgba(255,39,64,.5);transform:translateY(-3px);box-shadow:var(--glow);}
+.catcard b{display:block;font-family:var(--font-ui);font-size:1.06rem;margin-bottom:3px;}
+.catcard small{color:var(--muted-2);}
+.rank-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;text-align:left;width:100%;}
+.rank-item:last-child{border-bottom:none;}
+.rank-item:hover .rn{color:var(--red);}
+.rank-thumb{width:58px;height:38px;border-radius:8px;overflow:hidden;flex:0 0 auto;position:relative;background:#09090d;}
+.rank-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.rn{font-family:var(--font-ui);font-weight:600;font-size:.94rem;transition:.2s;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rmeta{color:var(--muted-2);font-size:.79rem;}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:200;background:#17171f;
+  border:1px solid rgba(255,39,64,.5);padding:12px 20px;border-radius:13px;box-shadow:var(--glow);
+  font-family:var(--font-ui);font-weight:600;font-size:.92rem;animation:tin .3s var(--ease);max-width:calc(100% - 32px);text-align:center;}
+@keyframes tin{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+.loader{display:grid;place-items:center;padding:80px 0;gap:14px;color:var(--muted);}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--red);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* modal */
+.overlay{position:fixed;inset:0;z-index:120;background:rgba(4,4,7,.8);backdrop-filter:blur(8px);
+  display:grid;place-items:start center;padding:6vh 16px 40px;overflow-y:auto;animation:fade .2s var(--ease);}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{width:min(460px,100%);background:var(--panel-solid);border:1px solid var(--line-2);border-radius:18px;
+  box-shadow:0 40px 90px -30px #000,var(--glow);overflow:hidden;animation:rise .28s var(--ease);}
+.modal.wide{width:min(720px,100%);}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 20px;border-bottom:1px solid var(--line);}
+.modal-head h3{font-size:1.18rem;}
+.modal-body{padding:20px;}
+.x{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--muted);border:1px solid var(--line);}
+.x:hover{color:#fff;background:rgba(255,39,64,.18);border-color:rgba(255,39,64,.5);}
+.x svg{width:15px;height:15px;fill:currentColor;}
+
+/* mobile bottom nav */
+.bottom{display:none;position:fixed;left:0;right:0;bottom:0;z-index:80;background:rgba(9,9,14,.94);
+  backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));}
+.bottom-in{display:flex;}
+.bottom button{flex:1;display:grid;justify-items:center;gap:3px;padding:7px 2px;border-radius:12px;color:var(--muted-2);font-size:.7rem;font-weight:600;}
+.bottom button svg{width:20px;height:20px;fill:currentColor;}
+.bottom button[aria-current="page"]{color:var(--red);}
+.bottom button[aria-current="page"] svg{filter:drop-shadow(0 0 8px rgba(255,39,64,.8));}
+.modal.sm{width:min(380px,100%);}
+.modal.sm .modal-body{padding:22px 22px 20px;}
+.notif{display:flex;gap:12px;align-items:flex-start;padding:12px 6px;border-bottom:1px solid var(--line);position:relative;}
+.notif:last-child{border-bottom:none;}
+.notif.unread{background:rgba(255,39,64,.05);border-radius:10px;}
+.notif.unread::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:2px;background:var(--red);}
+.n-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--line);}
+.n-ico svg{width:16px;height:16px;fill:currentColor;}
+.n-ico.new{color:var(--red-2);background:rgba(255,39,64,.12);}
+.n-ico.ok{color:#8ff0bb;background:rgba(61,220,132,.12);}
+.n-ico.bad{color:#ff97a3;background:rgba(255,39,64,.1);}
+.n-ico.info{color:#9ec8ff;background:rgba(90,150,255,.12);}
+.n-ico.like{color:var(--red-2);background:rgba(255,39,64,.12);}
+.notif-body{flex:1;min-width:0;text-align:left;background:none;border:none;padding:0;cursor:pointer;}
+.notif-body b{display:block;font-family:var(--font-ui);font-size:.92rem;font-weight:600;color:var(--text);}
+.notif-body p{margin:2px 0 3px;color:var(--muted);font-size:.86rem;overflow-wrap:anywhere;}
+.notif-body time{color:var(--muted-2);font-size:.78rem;}
+.n-del{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted-2);flex:0 0 auto;}
+.n-del svg{width:12px;height:12px;fill:currentColor;}
+.n-del:hover{color:#fff;background:rgba(255,39,64,.2);}
+.cover-drop{position:relative;border:1px dashed var(--line-2);border-radius:14px;overflow:hidden;background:#0b0b11;min-height:150px;display:flex;}
+.cover-drop.has-img{border-style:solid;border-color:var(--line);}
+.cover-pick{flex:1;display:grid;place-items:center;gap:6px;padding:28px 16px;color:var(--muted);transition:.2s;}
+.cover-pick:hover{color:var(--text);background:rgba(255,39,64,.05);}
+.cover-pick svg{opacity:.7;}
+.cover-pick b{font-family:var(--font-ui);font-size:.95rem;font-weight:600;}
+.cover-pick small{color:var(--muted-2);font-size:.78rem;}
+.cover-preview{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+.cover-overlay{position:absolute;inset:0;background:rgba(6,6,10,.6);display:grid;place-items:center;gap:8px;color:#fff;font-family:var(--font-ui);font-weight:600;font-size:.85rem;}
+.spinner.sm{width:22px;height:22px;border-width:2px;}
+.cover-actions{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;}
+.btn[disabled]{opacity:.55;cursor:not-allowed;pointer-events:none;}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted-2);font-size:.86rem;margin-top:36px;}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+
+@media(max-width:900px){
+  .nav,.searchbox,.spacer{display:none;}
+  .topbar-in{gap:10px;}
+  .topbar-in .lang{margin-left:auto;}
+  .userchip b{display:none;}
+  .burger{display:grid;}
+  .bottom{display:block;}
+  body{padding-bottom:74px;}
+  .toast{bottom:92px;}
+  .drawer-open .nav{display:flex;position:absolute;left:0;right:0;top:68px;flex-direction:column;align-items:stretch;
+    background:#0a0a10;border-bottom:1px solid var(--line);padding:10px;gap:2px;margin:0;}
+  .drawer-open .nav button{text-align:left;padding:13px 14px;font-size:1rem;}
+  .drawer-open .searchbox{display:block;position:absolute;left:10px;right:10px;top:68px;transform:translateY(310px);max-width:none;}
+  .hero-in{padding:58px 0 52px;}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="wrap topbar-in">
+    <button class="logo" data-go="home" aria-label="GameTime">
+      <span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M17 5H7a5 5 0 0 0-5 5v4a4 4 0 0 0 7.2 2.4l.3-.4h5l.3.4A4 4 0 0 0 22 14v-4a5 5 0 0 0-5-5ZM8.8 12H7.6v1.2a.9.9 0 1 1-1.8 0V12H4.6a.9.9 0 1 1 0-1.8h1.2V9a.9.9 0 1 1 1.8 0v1.2h1.2a.9.9 0 1 1 0 1.8Zm6.4 1.1a1.15 1.15 0 1 1 0-2.3 1.15 1.15 0 0 1 0 2.3Zm2.6-2.7a1.15 1.15 0 1 1 0-2.3 1.15 1.15 0 0 1 0 2.3Z"/></svg></span>
+      <span class="logo-txt">GAME<span>TIME</span></span>
+    </button>
+    <nav class="nav" id="nav"></nav>
+    <div class="spacer"></div>
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/></svg>
+      <input id="q" type="search" autocomplete="off">
+    </div>
+    <div class="lang" id="lang">
+      <button data-lang="en" aria-pressed="true">EN</button>
+      <button data-lang="ka" aria-pressed="false">ქართული</button>
+    </div>
+    <div id="auth-area" style="display:flex;align-items:center;gap:9px;"></div>
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="app"><div class="loader"><div class="spinner"></div><span>GameTime</span></div></main>
+
+<footer><div class="wrap"><span id="foot-1"></span><span id="foot-2"></span></div></footer>
+
+<nav class="bottom"><div class="bottom-in" id="bottom"></div></nav>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ========================= i18n ========================= */
+const T = {
+  en:{
+    home:"Home", games:"Games", community:"Community", categories:"Categories", addGame:"Add Game",
+    search:"Search", searchPh:"Search games, posts, people…", login:"Login", register:"Register",
+    logout:"Logout", profile:"Profile", notifications:"Notifications", settings:"Settings", admin:"Admin",
+    comments:"Comments", likes:"Likes", views:"Views", featured:"Featured Games", recent:"Recently Added",
+    trending:"Trending", openGame:"Open Game", externalSource:"External Source", officialWebsite:"Official Website",
+    trailer:"Trailer", watchTrailer:"Watch Trailer", storePage:"Store Page", submit:"Submit", share:"Share",
+    library:"GameTime Library", pending:"Pending Approval", approve:"Approve", reject:"Reject", edit:"Edit",
+    del:"Delete", ban:"Ban", unban:"Unban", feature:"Feature", unfeature:"Unfeature",
+    heroTitle:"DISCOVER. SHARE. PLAY.", heroSub:"Your gaming community starts here.",
+    explore:"EXPLORE GAMES", addOne:"ADD A GAME",
+    title:"Game name", description:"Description", cover:"Cover image", link:"Game website / link",
+    category:"Category", platform:"Platform", year:"Release year", screenshots:"Screenshots",
+    username:"Username", password:"Password", all:"All", posts:"Posts", users:"Users",
+    dashboard:"Dashboard", totalUsers:"Total users", totalGames:"Total games", pendingGames:"Pending games",
+    totalPosts:"Total posts", totalComments:"Total comments", totalLikes:"Total likes",
+    newPost:"New post", postTitle:"Title", postBody:"What's on your mind?", postType:"Post type",
+    typeRec:"Game recommendation", typeShot:"Screenshot", typeQ:"Question", typeReview:"Review",
+    typeNews:"News", typeDisc:"Discussion",
+    addComment:"Add a comment…", post:"Post", noComments:"No comments yet. Say something.",
+    emptyLib:"No games yet", emptyLibP:"Be the first to add a game to GameTime.",
+    emptyFeed:"Nothing posted yet", emptyFeedP:"Start the first conversation in the community.",
+    emptySearch:"Nothing matches that search", emptySearchP:"Try a different name, category or person.",
+    loginFirst:"Log in to continue", loginFirstP:"You need an account to post, like and comment.",
+    adminsOnly:"Administrators only", adminsOnlyP:"Sign in with an admin account to open the dashboard.",
+    submitted:"Submitted for review", submittedP:"An administrator will approve it before it appears in the library.",
+    published:"Published", saved:"Saved", deleted:"Deleted", approved:"Approved", rejected:"Rejected",
+    loggedOut:"Logged out", welcome:"Welcome to GameTime", taken:"That username is taken.",
+    badLogin:"Wrong username or password.", badName:"3–20 characters: letters, numbers, dot, dash, underscore.",
+    banned:"This account has been banned.", needName:"Give the game a name.", needLink:"Enter a valid http(s) link.",
+    by:"by", joined:"Joined", myGames:"Games posted", myLikes:"Games liked", myComments:"Recent comments",
+    noPending:"Nothing waiting for review.", moderate:"Moderate", member:"Member", administrator:"Administrator",
+    status:"Status", actions:"Actions", approvedS:"Approved", pendingS:"Pending", rejectedS:"Rejected",
+    game:"Game", author:"Author", date:"Date", back:"Back", details:"Details", about:"About",
+    relatedLinks:"Links", noLinks:"No links added.", addScreenshot:"Add screenshot URL",
+    add:"Add", upload:"Upload file", uploading:"Uploading…", uploaded:"Image uploaded.",
+    uploadFail:"Upload failed. Try a different image or try again.", uploadNA:"Cover uploads aren't available in this view — you can still publish without one.",
+    langNote:"Language", nothingNew:"Nothing new.", markRead:"All caught up",
+    filterAll:"All", filterGames:"Games", filterPosts:"Posts", filterUsers:"Users",
+    resultsFor:"Results for", noGamesCat:"No games in this category yet.",
+    confirmDel:"Are you sure you want to delete this game?", adminAdd:"Add to library", adminAddP:"Games you add here are published immediately.",
+    userAddP:"Your submission goes to the moderation queue.",
+    regHint:"This is a community account. Use a password you don't reuse elsewhere.",
+    demoteSelf:"You can't remove your own admin rights.", firstAdmin:"You're the first member, so you're the administrator.",
+    linksHint:"Optional. Each link opens in a new tab.", noDownload:"Links open in a new tab. Nothing downloads automatically.",
+    rules:"Posting rules", rulesP:"Link to official sites, storefronts or your own content. Links to pirated or cracked software are removed and the account is banned.",
+    profileOf:"Profile", nothingHere:"Nothing here yet.", viewAll:"View all", newest:"Newest", mostLiked:"Most liked",
+    mostCommented:"Most commented", contributors:"Top contributors", myPosts:"Posts",
+    cancel:"Cancel", actionFailed:"Something went wrong. Please try again.",
+    deleteFailed:"Couldn't delete. Please try again.", waitForUpload:"Wait for the image to finish uploading.",
+    needBody:"Write something first.", clearAll:"Clear all",
+    notifNewGame:"New game added", notifAddedBy:"Added by", notifApproved:"Your game was approved",
+    notifRejected:"Your game was rejected", notifComment:"New comment", notifCommentedOn:"commented on",
+    notifLike:"New like", notifLikedYourGame:"liked",
+    chooseImage:"Choose an image", replaceImage:"Replace", removeImage:"Remove",
+    invalidImageType:"Use a JPG, PNG or WEBP image.", imageTooLarge:"That image is too large (12MB max)."
+  },
+  ka:{
+    home:"მთავარი", games:"თამაშები", community:"საზოგადოება", categories:"კატეგორიები", addGame:"თამაშის დამატება",
+    search:"ძიება", searchPh:"მოძებნე თამაშები, პოსტები, მომხმარებლები…", login:"შესვლა", register:"რეგისტრაცია",
+    logout:"გასვლა", profile:"პროფილი", notifications:"შეტყობინებები", settings:"პარამეტრები", admin:"ადმინისტრირება",
+    comments:"კომენტარები", likes:"მოწონებები", views:"ნახვები", featured:"გამორჩეული თამაშები", recent:"ბოლოს დამატებული",
+    trending:"ტრენდული", openGame:"თამაშის გახსნა", externalSource:"გარე წყარო", officialWebsite:"ოფიციალური საიტი",
+    trailer:"ტრეილერი", watchTrailer:"ტრეილერის ნახვა", storePage:"მაღაზიის გვერდი", submit:"გაგზავნა", share:"გაზიარება",
+    library:"GameTime-ის ბიბლიოთეკა", pending:"განხილვის მოლოდინში", approve:"დამტკიცება", reject:"უარყოფა", edit:"რედაქტირება",
+    del:"წაშლა", ban:"დაბლოკვა", unban:"განბლოკვა", feature:"გამორჩეულად დაყენება", unfeature:"გამორჩეულიდან მოხსნა",
+    heroTitle:"აღმოაჩინე. გააზიარე. ითამაშე.", heroSub:"შენი გეიმერული საზოგადოება აქ იწყება.",
+    explore:"თამაშების დათვალიერება", addOne:"თამაშის დამატება",
+    title:"თამაშის სახელი", description:"აღწერა", cover:"გარეკანის სურათი", link:"თამაშის საიტი / ბმული",
+    category:"კატეგორია", platform:"პლატფორმა", year:"გამოშვების წელი", screenshots:"სქრინშოტები",
+    username:"მომხმარებლის სახელი", password:"პაროლი", all:"ყველა", posts:"პოსტები", users:"მომხმარებლები",
+    dashboard:"დაფა", totalUsers:"სულ მომხმარებელი", totalGames:"სულ თამაში", pendingGames:"განხილვის მოლოდინში",
+    totalPosts:"სულ პოსტი", totalComments:"სულ კომენტარი", totalLikes:"სულ მოწონება",
+    newPost:"ახალი პოსტი", postTitle:"სათაური", postBody:"რას ფიქრობ?", postType:"პოსტის ტიპი",
+    typeRec:"თამაშის რეკომენდაცია", typeShot:"სქრინშოტი", typeQ:"კითხვა", typeReview:"მიმოხილვა",
+    typeNews:"სიახლე", typeDisc:"დისკუსია",
+    addComment:"დაწერე კომენტარი…", post:"გამოქვეყნება", noComments:"კომენტარები ჯერ არ არის. დაწერე პირველი.",
+    emptyLib:"თამაშები ჯერ არ არის", emptyLibP:"იყავი პირველი, ვინც GameTime-ს თამაშს დაუმატებს.",
+    emptyFeed:"პოსტები ჯერ არ არის", emptyFeedP:"დაიწყე პირველი საუბარი საზოგადოებაში.",
+    emptySearch:"ძიებას შედეგი არ მოჰყვა", emptySearchP:"სცადე სხვა სახელი, კატეგორია ან მომხმარებელი.",
+    loginFirst:"გასაგრძელებლად შედი სისტემაში", loginFirstP:"პოსტის, მოწონებისა და კომენტარისთვის საჭიროა ანგარიში.",
+    adminsOnly:"მხოლოდ ადმინისტრატორებისთვის", adminsOnlyP:"დაფის გასახსნელად შედი ადმინის ანგარიშით.",
+    submitted:"გაიგზავნა განსახილველად", submittedP:"ბიბლიოთეკაში გამოჩენამდე ადმინისტრატორი დაამტკიცებს.",
+    published:"გამოქვეყნდა", saved:"შენახულია", deleted:"წაიშალა", approved:"დამტკიცდა", rejected:"უარყოფილია",
+    loggedOut:"გამოხვედი სისტემიდან", welcome:"კეთილი იყოს შენი მობრძანება GameTime-ზე", taken:"ეს სახელი დაკავებულია.",
+    badLogin:"არასწორი სახელი ან პაროლი.", badName:"3–20 სიმბოლო: ასოები, ციფრები, წერტილი, ტირე, ქვედა ტირე.",
+    banned:"ეს ანგარიში დაბლოკილია.", needName:"მიუთითე თამაშის სახელი.", needLink:"შეიყვანე სწორი http(s) ბმული.",
+    by:"ავტორი", joined:"შემოუერთდა", myGames:"დამატებული თამაშები", myLikes:"მოწონებული თამაშები", myComments:"ბოლო კომენტარები",
+    noPending:"განსახილველი არაფერია.", moderate:"მოდერაცია", member:"მომხმარებელი", administrator:"ადმინისტრატორი",
+    status:"სტატუსი", actions:"მოქმედებები", approvedS:"დამტკიცებული", pendingS:"განხილვაში", rejectedS:"უარყოფილი",
+    game:"თამაში", author:"ავტორი", date:"თარიღი", back:"უკან", details:"დეტალები", about:"აღწერა",
+    relatedLinks:"ბმულები", noLinks:"ბმულები არ არის დამატებული.", addScreenshot:"დაამატე სქრინშოტის ბმული",
+    add:"დამატება", upload:"ფაილის ატვირთვა", uploading:"იტვირთება…", uploaded:"სურათი აიტვირთა.",
+    uploadFail:"ატვირთვა ვერ მოხერხდა. სცადე სხვა სურათი ან სცადე ხელახლა.", uploadNA:"სურათის ატვირთვა აქ მიუწვდომელია — შეგიძლია თამაში სურათის გარეშეც გამოაქვეყნო.",
+    langNote:"ენა", nothingNew:"ახალი არაფერია.", markRead:"ყველაფერი ნანახია",
+    filterAll:"ყველა", filterGames:"თამაშები", filterPosts:"პოსტები", filterUsers:"მომხმარებლები",
+    resultsFor:"ძიების შედეგები:", noGamesCat:"ამ კატეგორიაში ჯერ თამაში არ არის.",
+    confirmDel:"დარწმუნებული ხარ, რომ გინდა ამ თამაშის წაშლა?", adminAdd:"ბიბლიოთეკაში დამატება", adminAddP:"აქ დამატებული თამაში მაშინვე ქვეყნდება.",
+    userAddP:"შენი განაცხადი მოდერაციის რიგში მოხვდება.",
+    regHint:"ეს საზოგადოების ანგარიშია. გამოიყენე პაროლი, რომელსაც სხვაგან არ იყენებ.",
+    demoteSelf:"საკუთარ ადმინის უფლებებს ვერ მოიხსნი.", firstAdmin:"შენ პირველი წევრი ხარ, ამიტომ ადმინისტრატორი ხარ.",
+    linksHint:"არასავალდებულო. თითოეული ბმული ახალ ფანჯარაში იხსნება.",
+    noDownload:"ბმულები ახალ ფანჯარაში იხსნება. არაფერი იტვირთება ავტომატურად.",
+    rules:"გამოქვეყნების წესები", rulesP:"დაამატე ოფიციალური საიტების, მაღაზიების ან შენი კონტენტის ბმულები. პირატული ან გატეხილი პროგრამების ბმულები იშლება და ანგარიში იბლოკება.",
+    profileOf:"პროფილი", nothingHere:"აქ ჯერ არაფერია.", viewAll:"ყველას ნახვა", newest:"უახლესი", mostLiked:"ყველაზე მოწონებული",
+    mostCommented:"ყველაზე კომენტირებული", contributors:"საუკეთესო წევრები", myPosts:"პოსტები",
+    cancel:"გაუქმება", actionFailed:"რაღაც შეცდომა მოხდა. სცადე ხელახლა.",
+    deleteFailed:"წაშლა ვერ მოხერხდა. სცადე ხელახლა.", waitForUpload:"დაელოდე სურათის ატვირთვის დასრულებას.",
+    needBody:"ჯერ დაწერე რამე.", clearAll:"ყველას გასუფთავება",
+    notifNewGame:"ახალი თამაში დაემატა", notifAddedBy:"დაამატა", notifApproved:"შენი თამაში დამტკიცდა",
+    notifRejected:"შენი თამაში უარყოფილია", notifComment:"ახალი კომენტარი", notifCommentedOn:"დააკომენტარა",
+    notifLike:"ახალი მოწონება", notifLikedYourGame:"მოიწონა",
+    chooseImage:"სურათის არჩევა", replaceImage:"შეცვლა", removeImage:"წაშლა",
+    invalidImageType:"გამოიყენე JPG, PNG ან WEBP ფორმატის სურათი.", imageTooLarge:"სურათი ზედმეტად დიდია (მაქს. 12MB)."
+  }
+};
+let LANG = localStorage.getItem("gt_lang") || "en";
+if(!T[LANG]) LANG = "en";
+const t = k => (T[LANG] && T[LANG][k]) || T.en[k] || k;
+
+const CATS = [
+  {id:"Action",      en:"Action",       ka:"მოქმედება"},
+  {id:"Adventure",   en:"Adventure",    ka:"თავგადასავალი"},
+  {id:"Horror",      en:"Horror",       ka:"საშინელება"},
+  {id:"Racing",      en:"Racing",       ka:"რბოლა"},
+  {id:"RPG",         en:"RPG",          ka:"როლური (RPG)"},
+  {id:"FPS",         en:"FPS",          ka:"სროლა (FPS)"},
+  {id:"Multiplayer", en:"Multiplayer",  ka:"მულტიპლეიერი"},
+  {id:"Simulator",   en:"Simulator",    ka:"სიმულატორი"},
+  {id:"Survival",    en:"Survival",     ka:"გადარჩენა"},
+  {id:"Open World",  en:"Open World",   ka:"ღია სამყარო"},
+  {id:"Sports",      en:"Sports",       ka:"სპორტი"},
+  {id:"Strategy",    en:"Strategy",     ka:"სტრატეგია"},
+  {id:"Other",       en:"Other",        ka:"სხვა"}
+];
+const catName = id => { const c = CATS.find(c=>c.id===id); return c ? c[LANG] : id; };
+const PLATFORMS = ["PC","PlayStation","Xbox","Nintendo Switch","Mobile","Browser","VR","Multi-platform"];
+const PTYPES = [
+  {id:"rec",    key:"typeRec"}, {id:"shot", key:"typeShot"}, {id:"question", key:"typeQ"},
+  {id:"review", key:"typeReview"}, {id:"news", key:"typeNews"}, {id:"discussion", key:"typeDisc"}
+];
+const ptypeName = id => { const p = PTYPES.find(p=>p.id===id); return p ? t(p.key) : id; };
+
+/* ========================= library seed =========================
+   No games are seeded or imported from any external source. The
+   public library contains only what is intentionally created inside
+   GameTime: admin-added entries and admin-approved user submissions.
+   The ids below are the entries a previous version of this page
+   auto-created; they are removed (not recreated) so the library
+   starts clean and stays that way. */
+const REMOVED_SEED_IDS = [
+  "gt-gta-v-enhanced","gt-forza-horizon-6","gt-spider-man-2","gt-beamng-drive","gt-rdr2"
+];
+
+/* ========================= state ========================= */
+let db=null, assets=null, userCap=null, ready=false;
+let platformCanEdit=false, platformIsOwner=false;
+const DATA = {games:new Map(), posts:new Map(), comments:new Map(), users:new Map(), notifications:new Map(), roles:new Map()};
+const S = {view:"home", q:"", filter:"all", cat:"All", user:null, game:null, profile:null,
+           feedTab:"newest", adminTab:"dashboard", editing:null, drawer:false, openPost:null,
+           addCover:{url:"",preview:"",uploading:false,error:""}};
+let modal = null;
+let confirmMsg = "", confirmResolve = null;
+
+/* ========================= storage =========================
+   Every write updates the in-memory DATA map immediately (optimistic),
+   re-renders right away so the UI never waits on a network round trip,
+   then persists to the real backend. If the backend call fails, the
+   local change is rolled back, the UI re-renders again, and the error
+   is surfaced with a toast rather than swallowed. */
+const LSKEY = "gametime_v2_local";
+const lsAll = ()=>{ try{ return JSON.parse(localStorage.getItem(LSKEY)||"{}"); }catch(e){ return {}; } };
+const lsSave = o => { try{ localStorage.setItem(LSKEY, JSON.stringify(o)); }catch(e){} };
+function lsLoad(){ const o=lsAll(); Object.keys(DATA).forEach(c=>{ DATA[c].clear();
+  Object.entries(o[c]||{}).forEach(([k,v])=>DATA[c].set(k,v)); }); }
+async function put(coll,id,data){
+  const prev = DATA[coll].get(id), hadPrev = DATA[coll].has(id);
+  DATA[coll].set(id,data); render();
+  if(db){
+    try{ await db.doc(coll+"/"+id).set(data); }
+    catch(err){
+      if(hadPrev) DATA[coll].set(id,prev); else DATA[coll].delete(id);
+      render(); toast(t("actionFailed")); throw err;
+    }
+    return;
+  }
+  const o=lsAll(); o[coll]=o[coll]||{}; o[coll][id]=data; lsSave(o);
+}
+async function remove(coll,id){
+  const prev = DATA[coll].get(id), hadPrev = DATA[coll].has(id);
+  DATA[coll].delete(id); render();
+  if(db){
+    try{ await db.doc(coll+"/"+id).delete(); }
+    catch(err){
+      if(hadPrev) DATA[coll].set(id,prev);
+      render(); toast(t("deleteFailed")); throw err;
+    }
+    return;
+  }
+  const o=lsAll(); if(o[coll]) delete o[coll][id]; lsSave(o);
+}
+
+/* ========================= helpers ========================= */
+const uid = ()=> Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const allGames = ()=> [...DATA.games.values()];
+const libGames = ()=> allGames().filter(g=>(g.status||"approved")==="approved");
+const posts = ()=> [...DATA.posts.values()];
+const comments = ()=> [...DATA.comments.values()];
+const usersAll = ()=> [...DATA.users.values()];
+const cFor = (kind,id)=> comments().filter(c=>c.targetId===id&&c.target===kind).sort((a,b)=>a.createdAt-b.createdAt);
+const gameById = id => DATA.games.get(id);
+const userByName = n => DATA.users.get(String(n||"").toLowerCase());
+/* Authorization source of truth. roles/<username> is a separate
+   collection whose writes require "can edit" access to this artifact
+   itself (see the db rules declared at publish) — a real, platform-
+   enforced boundary, unlike the old per-user "admin" field which any
+   signed-in viewer could overwrite directly. Any legacy admin/banned
+   flag still sitting on a users/* doc from before this change is
+   ignored here on purpose. */
+function roleFor(username){
+  const r = DATA.roles.get(String(username||"").toLowerCase());
+  return {admin: !!(r&&r.admin), banned: !!(r&&r.banned)};
+}
+const isAdmin = ()=> !!(S.user && roleFor(S.user.username).admin);
+const likeN = o => (o.likes||[]).length;
+const cN = (k,o) => cFor(k,o.id).length;
+
+function hue(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360; return h; }
+function avatar(name,cls){
+  const h=hue(name||"?");
+  return `<span class="avatar ${cls||""}" style="background:linear-gradient(140deg,hsl(${h} 82% 62%),hsl(${(h+44)%360} 74% 44%))">${esc((name||"?").slice(0,2).toUpperCase())}</span>`;
+}
+function coverHTML(g){
+  const h=hue(g.title||g.name||"");
+  const bg=`linear-gradient(140deg,hsl(${h} 55% 20%),#08080d 64%),radial-gradient(circle at 72% 22%,rgba(255,39,64,.4),transparent 58%)`;
+  const ini=esc((g.title||"?").split(/\s+/).map(w=>w[0]).join("").slice(0,3).toUpperCase());
+  return `<span class="fb" style="background:${bg}"><span>${ini}</span></span>`+
+         (g.cover?`<img src="${esc(g.cover)}" alt="" loading="lazy" onerror="this.remove()">`:"");
+}
+function safeUrl(u){ try{ const x=new URL(String(u).trim()); return (x.protocol==="http:"||x.protocol==="https:")?x.href:null; }catch(e){ return null; } }
+const host = u => { try{ return new URL(u).hostname.replace(/^www\./,""); }catch(e){ return ""; } };
+function ago(ts){
+  const s=Math.max(1,(Date.now()-ts)/1000);
+  if(s<60) return LANG==="ka"?"ახლახან":"just now";
+  const m=s/60; if(m<60) return Math.floor(m)+(LANG==="ka"?" წთ":"m");
+  const h=m/60; if(h<24) return Math.floor(h)+(LANG==="ka"?" სთ":"h");
+  const d=h/24; if(d<7) return Math.floor(d)+(LANG==="ka"?" დღე":"d");
+  return new Date(ts).toLocaleDateString(LANG==="ka"?"ka-GE":undefined,{day:"numeric",month:"short",year:"numeric"});
+}
+async function sha(txt){
+  const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("gt2::"+txt));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function toast(msg){
+  const r=document.getElementById("toast-root");
+  r.innerHTML=`<div class="toast">${esc(msg)}</div>`;
+  clearTimeout(toast._t); toast._t=setTimeout(()=>r.innerHTML="",2600);
+}
+const I = {
+  heart:'<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 6.6 5.4 5.4 0 0 1 21.6 12c-2.1 4.4-9.6 9-9.6 9Z"/></svg>',
+  chat:'<svg viewBox="0 0 24 24"><path d="M4 3h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4V5a2 2 0 0 1 2-2Z"/></svg>',
+  eye:'<svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
+  ext:'<svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3ZM5 5h5v2H6v11h11v-4h2v6H4V5h1Z"/></svg>',
+  share:'<svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2.2 1l-6-3.2a3 3 0 0 0 0-1.6l6-3.2a3 3 0 1 0-1-2 3 3 0 0 0 .1.7L8.9 8a3 3 0 1 0 0 8l6 3.3a3 3 0 1 0 3.1-3.3Z"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="m12 10.6 5.3-5.3 1.4 1.4-5.3 5.3 5.3 5.3-1.4 1.4-5.3-5.3-5.3 5.3-1.4-1.4 5.3-5.3-5.3-5.3 1.4-1.4 5.3 5.3Z"/></svg>',
+  bell:'<svg viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.5-2.5h-5A2.5 2.5 0 0 0 12 22Zm7-6v-5a7 7 0 0 0-5.5-6.8V3a1.5 1.5 0 1 0-3 0v1.2A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>',
+  warn:'<svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2Zm0 6a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1Zm0 9.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/></svg>',
+  home:'<svg viewBox="0 0 24 24"><path d="M12 3 2 11h3v9h6v-6h2v6h6v-9h3L12 3Z"/></svg>',
+  grid:'<svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z"/></svg>',
+  people:'<svg viewBox="0 0 24 24"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-7 1.7-7 4v3h14v-3c0-2.3-3.7-4-7-4Zm8.5-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5 2c-.9 0-1.9.2-2.7.5 1.4.9 2.2 2.1 2.2 3.5v3h5v-3c0-2.2-3-4-4.5-4Z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></svg>',
+  user:'<svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5Z"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>'
+};
+
+/* ========================= session ========================= */
+function loadSession(){
+  const n = localStorage.getItem("gt_session");
+  const u = n ? userByName(n) : null;
+  S.user = (u && !roleFor(n).banned) ? u : null;
+  if(u && roleFor(n).banned) localStorage.removeItem("gt_session");
+}
+function setSession(u){
+  if(u){ localStorage.setItem("gt_session", u.username.toLowerCase()); S.user=u; }
+  else { localStorage.removeItem("gt_session"); S.user=null; }
+}
+
+/* ========================= sorting ========================= */
+const byNew=(a,b)=>b.createdAt-a.createdAt;
+const byHotG=(a,b)=>(likeN(b)*2+cN("game",b)*3+(b.views||0)*.1)-(likeN(a)*2+cN("game",a)*3+(a.views||0)*.1)||byNew(a,b);
+const byLikesG=(a,b)=>likeN(b)-likeN(a)||byNew(a,b);
+const byCommG=(a,b)=>cN("game",b)-cN("game",a)||byNew(a,b);
+
+function matchGame(g){
+  const q=S.q.trim().toLowerCase(); if(!q) return true;
+  return [g.title,g.category,catName(g.category),g.platform,g.author,g.description,String(g.year||"")]
+    .some(v=>String(v||"").toLowerCase().includes(q));
+}
+function matchPost(p){
+  const q=S.q.trim().toLowerCase(); if(!q) return true;
+  return [p.title,p.body,p.author,ptypeName(p.type)].some(v=>String(v||"").toLowerCase().includes(q));
+}
+
+/* ========================= chrome ========================= */
+function chrome(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("#lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===LANG)));
+  const qEl=document.getElementById("q"); qEl.placeholder=t("searchPh"); qEl.setAttribute("aria-label",t("search"));
+  if(qEl.value!==S.q) qEl.value=S.q;
+
+  const items=[["home","home"],["games","games"],["community","community"],["categories","categories"],["add","addGame"]];
+  if(S.user) items.push(["me","profile"]);
+  if(isAdmin()) items.push(["admin","admin"]);
+  document.getElementById("nav").innerHTML = items.map(([v,k])=>
+    `<button data-go="${v}" ${S.view===v?'aria-current="page"':""}>${esc(t(k))}</button>`).join("");
+
+  const unread = unreadNotifications();
+  document.getElementById("auth-area").innerHTML = S.user
+    ? `<button class="bell" data-modal="notes" aria-label="${esc(t("notifications"))}${unread.length?" ("+unread.length+")":""}">${I.bell}${unread.length?`<b>${unread.length>99?"99+":unread.length}</b>`:""}</button>
+       <button class="userchip" data-profile="${esc(S.user.username)}">${avatar(S.user.username)}<b>${esc(S.user.username)}</b></button>
+       <button class="btn btn-sm btn-ghost" data-modal="settings">${esc(t("settings"))}</button>`
+    : `<button class="btn btn-sm btn-ghost" data-auth="login">${esc(t("login"))}</button>
+       <button class="btn btn-sm btn-red" data-auth="register">${esc(t("register"))}</button>`;
+
+  const bn=[["home",I.home,"home"],["games",I.grid,"games"],["community",I.people,"community"],
+            ["add",I.plus,"addGame"],[S.user?"me":"login",I.user,S.user?"profile":"login"]];
+  document.getElementById("bottom").innerHTML = bn.map(([v,ic,k])=>
+    `<button data-${v==="login"?"auth":"go"}="${v==="login"?"login":v}" ${S.view===v?'aria-current="page"':""}>${ic}<span>${esc(t(k))}</span></button>`).join("");
+
+  document.getElementById("foot-1").textContent = "GameTime";
+  document.getElementById("foot-2").textContent = t("noDownload");
+}
+/* ========================= notifications =========================
+   Real, persistent, per-user records in the "notifications" collection
+   (fields: userId, type, gameId/postId, actor, title snapshot, read,
+   createdAt). Every write uses a deterministic id for its event type,
+   so re-triggering the same event (e.g. re-liking after an unlike)
+   upserts one record instead of creating duplicates. */
+function myNotifications(){
+  if(!S.user) return [];
+  const me=S.user.username.toLowerCase();
+  return [...DATA.notifications.values()].filter(n=>n.userId===me).sort(byNew);
+}
+function unreadNotifications(){ return myNotifications().filter(n=>!n.read); }
+async function markAllNotificationsRead(){
+  for(const n of myNotifications().filter(n=>!n.read)) await put("notifications",n.id,{...n,read:true}).catch(()=>{});
+}
+async function notifyNewGame(g){
+  const recipients = usersAll().filter(u=>u.username.toLowerCase()!==String(g.author||"").toLowerCase());
+  for(const u of recipients){
+    const nid = "ng-"+g.id+"-"+u.username.toLowerCase();
+    await put("notifications",nid,{id:nid,userId:u.username.toLowerCase(),type:"new_game",
+      gameId:g.id,title:g.title,actor:g.author,read:false,createdAt:Date.now()}).catch(()=>{});
+  }
+}
+async function notifyGameStatus(g,status,actor){
+  if(!g.author) return;
+  const recipientKey=g.author.toLowerCase();
+  if(actor && actor.toLowerCase()===recipientKey) return;
+  const nid="gs-"+g.id+"-"+status;
+  await put("notifications",nid,{id:nid,userId:recipientKey,type:status==="approved"?"game_approved":"game_rejected",
+    gameId:g.id,title:g.title,actor:actor||t("administrator"),read:false,createdAt:Date.now()}).catch(()=>{});
+}
+async function notifyComment(kind,targetId,commentId,commenter){
+  const target = kind==="game" ? gameById(targetId) : DATA.posts.get(targetId);
+  if(!target||!target.author) return;
+  const recipientKey=target.author.toLowerCase();
+  if(recipientKey===commenter.toLowerCase()) return;
+  const nid="cm-"+commentId;
+  await put("notifications",nid,{id:nid,userId:recipientKey,type:kind==="game"?"comment_game":"comment_post",
+    gameId:kind==="game"?targetId:"",postId:kind==="post"?targetId:"",title:target.title||target.body||"",
+    actor:commenter,read:false,createdAt:Date.now()}).catch(()=>{});
+}
+async function notifyLike(kind,targetId,liker){
+  const target = kind==="games" ? gameById(targetId) : DATA.posts.get(targetId);
+  if(!target||!target.author) return;
+  const recipientKey=target.author.toLowerCase();
+  if(recipientKey===liker.toLowerCase()) return;
+  const nid="lk-"+kind+"-"+targetId+"-"+liker.toLowerCase();
+  await put("notifications",nid,{id:nid,userId:recipientKey,type:"like_"+(kind==="games"?"game":"post"),
+    gameId:kind==="games"?targetId:"",postId:kind==="posts"?targetId:"",title:target.title||target.body||"",
+    actor:liker,read:false,createdAt:Date.now()}).catch(()=>{});
+}
+function notifMeta(n){
+  const m={
+    new_game:{ic:I.plus,cls:"new",title:t("notifNewGame"),lines:[n.title,t("notifAddedBy")+": "+n.actor]},
+    game_approved:{ic:I.check,cls:"ok",title:t("notifApproved"),lines:[n.title]},
+    game_rejected:{ic:I.x,cls:"bad",title:t("notifRejected"),lines:[n.title]},
+    comment_game:{ic:I.chat,cls:"info",title:t("notifComment"),lines:[n.actor+" "+t("notifCommentedOn")+" "+n.title]},
+    comment_post:{ic:I.chat,cls:"info",title:t("notifComment"),lines:[n.actor+" "+t("notifCommentedOn")+" "+(n.title||t("myPosts"))]},
+    like_game:{ic:I.heart,cls:"like",title:t("notifLike"),lines:[n.actor+" "+t("notifLikedYourGame")+" "+n.title]},
+    like_post:{ic:I.heart,cls:"like",title:t("notifLike"),lines:[n.actor+" "+t("notifLikedYourGame")+" "+(n.title||t("myPosts"))]}
+  };
+  return m[n.type]||{ic:I.bell,cls:"info",title:n.type,lines:[n.title||""]};
+}
+function notifRow(n){
+  const meta=notifMeta(n);
+  const go={view: n.gameId?"game":(n.type==="new_game"?"games":"community"), id:n.gameId||""};
+  return `<div class="notif ${n.read?"":"unread"}">
+    <span class="n-ico ${meta.cls}">${meta.ic}</span>
+    <button class="notif-body" data-note='${esc(JSON.stringify(go))}'>
+      <b>${esc(meta.title)}</b>
+      <p>${meta.lines.filter(Boolean).map(esc).join(" · ")}</p>
+      <time>${ago(n.createdAt)}</time>
+    </button>
+    <button class="n-del" data-delnote="${n.id}" aria-label="${esc(t("del"))}" title="${esc(t("del"))}">${I.x}</button>
+  </div>`;
+}
+
+/* ========================= cards ========================= */
+function gameCard(g){
+  const liked = S.user && (g.likes||[]).includes(S.user.username);
+  const url = safeUrl(g.link)||safeUrl(g.source)||safeUrl(g.official);
+  return `<article class="card ${g.featured?"featured":""}">
+    <div class="cover" data-game="${g.id}">${coverHTML(g)}
+      <span class="pill cat">${esc(catName(g.category))}</span>
+      ${g.featured?`<span class="pill feat">FEATURED</span>`:(g.status==="pending"?`<span class="pill pend">${esc(t("pendingS"))}</span>`:"")}
+    </div>
+    <div class="card-body">
+      <h3 data-game="${g.id}">${esc(g.title)}</h3>
+      <div class="meta-row">${g.platform?`<span>${esc(g.platform)}</span>`:""}${g.year?`<span>${esc(g.year)}</span>`:""}</div>
+      <p class="desc">${esc(g.description||"")}</p>
+      <div class="byline">${avatar(g.author,"sm")}<b data-profile="${esc(g.author)}">${esc(g.author)}</b><span>·</span><span>${ago(g.createdAt)}</span></div>
+      <div class="card-foot">
+        <button class="act ${liked?"on":""}" data-like="${g.id}" aria-label="${esc(t("likes"))}">${I.heart}<span>${likeN(g)}</span></button>
+        <button class="act" data-game="${g.id}" aria-label="${esc(t("comments"))}">${I.chat}<span>${cN("game",g)}</span></button>
+        <span class="act" title="${esc(t("views"))}">${I.eye}<span>${g.views||0}</span></span>
+        ${url?`<a class="btn btn-sm btn-red push" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow">${esc(t("openGame"))}</a>`:""}
+      </div>
+    </div></article>`;
+}
+const gamesGrid = (list)=> `<div class="grid-games">${list.map(gameCard).join("")}</div>`;
+function emptyBox(title,body,btn){
+  return `<div class="empty"><h3>${esc(title)}</h3><p>${esc(body)}</p>${btn||""}</div>`;
+}
+function postCard(p){
+  const liked = S.user && (p.likes||[]).includes(S.user.username);
+  const g = p.gameId ? gameById(p.gameId) : null;
+  const cs = cFor("post",p.id);
+  return `<article class="post" id="post-${p.id}">
+    <div class="post-head">${avatar(p.author,"sm")}
+      <b data-profile="${esc(p.author)}" style="font-family:var(--font-ui);font-size:.92rem;cursor:pointer">${esc(p.author)}</b>
+      <span class="rmeta">${ago(p.createdAt)}</span>
+      <span class="ptype">${esc(ptypeName(p.type))}</span>
+      ${g?`<button class="rmeta" data-game="${g.id}" style="color:var(--red-2)">↳ ${esc(g.title)}</button>`:""}
+    </div>
+    ${p.title?`<h3>${esc(p.title)}</h3>`:""}
+    <p class="body">${esc(p.body||"")}</p>
+    ${p.image?`<div style="margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--line)"><img src="${esc(p.image)}" alt="" onerror="this.parentElement.remove()"></div>`:""}
+    <div class="post-foot">
+      <button class="act ${liked?"on":""}" data-plike="${p.id}">${I.heart}<span>${likeN(p)}</span></button>
+      <button class="act" data-pcomments="${p.id}">${I.chat}<span>${cs.length}</span></button>
+      <button class="act" data-share="${p.id}">${I.share}<span>${esc(t("share"))}</span></button>
+      ${(S.user&&(isAdmin()||S.user.username===p.author))?`<button class="btn btn-sm btn-danger push" data-delpost="${p.id}">${esc(t("del"))}</button>`:""}
+    </div>
+    <div id="pc-${p.id}" ${S.openPost===p.id?"":"hidden"} style="margin-top:6px">
+      ${S.user?`<form data-cform="post:${p.id}" style="display:flex;gap:9px;align-items:center;margin:10px 0">
+        ${avatar(S.user.username,"sm")}
+        <input name="text" maxlength="500" placeholder="${esc(t("addComment"))}" required
+          style="flex:1;background:#0c0c12;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:10px 13px">
+        <button class="btn btn-sm btn-red" type="submit">${esc(t("post"))}</button></form>`
+       :`<p class="rmeta" style="margin:10px 0"><button class="btn btn-sm btn-ghost" data-auth="login">${esc(t("login"))}</button></p>`}
+      ${cs.map(c=>commentHTML(c)).join("")||`<p class="rmeta" style="padding:6px 0">${esc(t("noComments"))}</p>`}
+    </div></article>`;
+}
+function commentHTML(c){
+  const liked = S.user && (c.likes||[]).includes(S.user.username);
+  const del = S.user && (isAdmin()||S.user.username===c.author);
+  return `<div class="comment">${avatar(c.author,"sm")}<div class="comment-main">
+    <div class="comment-head"><b data-profile="${esc(c.author)}">${esc(c.author)}</b><time>${ago(c.createdAt)}</time></div>
+    <p>${esc(c.text)}</p>
+    <div style="display:flex;gap:4px">
+      <button class="act ${liked?"on":""}" data-clike="${c.id}" style="padding:4px 7px;font-size:.8rem">${I.heart}<span>${likeN(c)}</span></button>
+      ${del?`<button class="act" data-delcomment="${c.id}" style="padding:4px 7px;font-size:.8rem">${esc(t("del"))}</button>`:""}
+    </div></div></div>`;
+}
+
+/* ========================= views ========================= */
+function vHome(){
+  const lib=libGames();
+  const feat=lib.filter(g=>g.featured).sort(byNew);
+  const trend=[...lib].sort(byHotG).slice(0,6);
+  const recent=[...lib].sort(byNew).slice(0,6);
+  const empty = !lib.length;
+  return `
+  <section class="hero"><div class="hero-bg"><span class="aur a1"></span><span class="aur a2"></span><span class="grid"></span><span class="beam"></span></div>
+    <div class="wrap hero-in">
+      <h1>${LANG==="ka"?`აღმოაჩინე<i>.</i> გააზიარე<i>.</i> ითამაშე<i>.</i>`:`DISCOVER<i>.</i> SHARE<i>.</i> PLAY<i>.</i>`}</h1>
+      <p>${esc(t("heroSub"))}</p>
+      <div class="hero-actions">
+        <button class="btn btn-red btn-lg" data-go="games">${esc(t("explore"))}</button>
+        <button class="btn btn-lg btn-ghost" data-go="add">${esc(t("addOne"))}</button>
+      </div>
+      <div class="stats">
+        <div><b>${lib.length}</b><small>${esc(t("totalGames"))}</small></div>
+        <div><b>${posts().length}</b><small>${esc(t("totalPosts"))}</small></div>
+        <div><b>${lib.reduce((n,g)=>n+likeN(g),0)}</b><small>${esc(t("likes"))}</small></div>
+        <div><b>${usersAll().length}</b><small>${esc(t("totalUsers"))}</small></div>
+      </div>
+    </div></section>
+
+  ${empty?`<section class="section wrap">${emptyBox(t("emptyLib"),t("emptyLibP"),
+      isAdmin()?`<button class="btn btn-red" data-go="add">${esc(t("adminAdd"))}</button>`
+               :`<button class="btn btn-red" data-go="add">${esc(t("addGame"))}</button>`)}</section>`
+  :`
+  ${feat.length?`<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("featured"))}</h2><p>${esc(t("library"))}</p></div>
+      <button class="btn btn-sm btn-ghost" data-go="games">${esc(t("viewAll"))}</button></div>
+    ${gamesGrid(feat.slice(0,6))}</section>`:""}
+
+  <section class="section wrap" style="${feat.length?"padding-top:0":""}">
+    <div class="section-head"><div><h2><i></i>${esc(t("trending"))}</h2></div></div>
+    ${gamesGrid(trend)}</section>
+
+  <section class="section wrap" style="padding-top:0">
+    <div class="section-head"><div><h2><i></i>${esc(t("recent"))}</h2></div></div>
+    ${gamesGrid(recent)}</section>
+
+  <section class="section wrap" style="padding-top:0">
+    <div class="section-head"><div><h2><i></i>${esc(t("community"))}</h2></div>
+      <button class="btn btn-sm btn-ghost" data-go="community">${esc(t("viewAll"))}</button></div>
+    <div class="feed">${posts().sort(byNew).slice(0,3).map(postCard).join("")||emptyBox(t("emptyFeed"),t("emptyFeedP"),`<button class="btn btn-red" data-go="community">${esc(t("newPost"))}</button>`)}</div>
+  </section>`}`;
+}
+
+function vGames(){
+  let list=libGames().filter(matchGame);
+  if(S.cat!=="All") list=list.filter(g=>g.category===S.cat);
+  list.sort(byNew);
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("library"))}</h2>
+      <p>${list.length} ${esc(t("games").toLowerCase())}${S.cat!=="All"?" · "+esc(catName(S.cat)):""}</p></div>
+      <button class="btn btn-sm btn-red" data-go="add">+ ${esc(t("addGame"))}</button></div>
+    <div class="chips"><button class="chip" data-cat="All" aria-pressed="${S.cat==="All"}">${esc(t("all"))}</button>
+      ${CATS.map(c=>`<button class="chip" data-cat="${esc(c.id)}" aria-pressed="${S.cat===c.id}">${esc(c[LANG])}</button>`).join("")}</div>
+    ${list.length?gamesGrid(list):emptyBox(S.q?t("emptySearch"):t("emptyLib"),S.q?t("emptySearchP"):t("emptyLibP"),`<button class="btn btn-red" data-go="add">${esc(t("addGame"))}</button>`)}
+  </section>`;
+}
+
+function vCategories(){
+  const lib=libGames();
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("categories"))}</h2></div></div>
+    <div class="catgrid">${CATS.map(c=>{
+      const n=lib.filter(g=>g.category===c.id).length;
+      return `<button class="catcard" data-cat-page="${esc(c.id)}"><b>${esc(c[LANG])}</b><small>${n} ${esc(t("games").toLowerCase())}</small></button>`;
+    }).join("")}</div></section>`;
+}
+
+function vGame(){
+  const g=gameById(S.game);
+  if(!g) return `<section class="section wrap">${emptyBox(t("emptySearch"),t("emptySearchP"),`<button class="btn btn-red" data-go="games">${esc(t("games"))}</button>`)}</section>`;
+  if((g.status||"approved")!=="approved" && !(isAdmin()||(S.user&&S.user.username===g.author)))
+    return `<section class="section wrap">${emptyBox(t("pending"),t("submittedP"),`<button class="btn btn-red" data-go="games">${esc(t("games"))}</button>`)}</section>`;
+  const cs=cFor("game",g.id);
+  const liked=S.user&&(g.likes||[]).includes(S.user.username);
+  const links=[["link","openGame","btn-red"],["official","officialWebsite",""],["source","externalSource",""],["trailer","watchTrailer",""]]
+    .map(([k,label,cls])=>{ const u=safeUrl(g[k]); return u?`<a class="btn ${cls}" href="${esc(u)}" target="_blank" rel="noopener noreferrer nofollow">${esc(t(label))} ${I.ext}</a>`:""; }).join("");
+  const shots=(g.screenshots||[]).filter(Boolean);
+  return `<section class="section wrap">
+    <button class="btn btn-sm btn-ghost" data-go="games" style="margin-bottom:16px">← ${esc(t("back"))}</button>
+    <div class="banner">${coverHTML(g)}
+      <span class="pill cat">${esc(catName(g.category))}</span>
+      ${g.featured?`<span class="pill feat">FEATURED</span>`:""}
+      ${g.status==="pending"?`<span class="pill pend">${esc(t("pendingS"))}</span>`:""}</div>
+    <div class="detail-split">
+      <div>
+        <h1 style="font-size:clamp(1.8rem,4.2vw,2.6rem)">${esc(g.title)}</h1>
+        <div class="byline" style="margin:12px 0 18px">${avatar(g.author,"sm")}
+          <b data-profile="${esc(g.author)}">${esc(g.author)}</b><span>·</span><span>${ago(g.createdAt)}</span>
+          <span>·</span><span>${g.views||0} ${esc(t("views").toLowerCase())}</span></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px">${links||`<span class="rmeta">${esc(t("noLinks"))}</span>`}</div>
+        <div class="note info">${I.warn}<span>${esc(t("noDownload"))}</span></div>
+
+        <h3 style="font-size:1.15rem;margin:26px 0 8px">${esc(t("about"))}</h3>
+        <p style="color:#d5d5de;white-space:pre-wrap;margin:0">${esc(g.description||"—")}</p>
+
+        ${shots.length?`<h3 style="font-size:1.15rem;margin:26px 0 12px">${esc(t("screenshots"))}</h3>
+          <div class="shots">${shots.map(s=>`<div><img src="${esc(s)}" alt="" onerror="this.parentElement.remove()"></div>`).join("")}</div>`:""}
+
+        <div style="display:flex;gap:6px;align-items:center;margin:26px 0 0;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap">
+          <button class="act ${liked?"on":""}" data-like="${g.id}">${I.heart}<span>${likeN(g)} ${esc(t("likes").toLowerCase())}</span></button>
+          <span class="act">${I.chat}<span>${cs.length} ${esc(t("comments").toLowerCase())}</span></span>
+          ${(S.user&&(isAdmin()||S.user.username===g.author))?`<button class="btn btn-sm" data-editgame="${g.id}">${esc(t("edit"))}</button>
+            <button class="btn btn-sm btn-danger" data-delgame="${g.id}">${esc(t("del"))}</button>`:""}
+          ${isAdmin()?`<button class="btn btn-sm" data-feature="${g.id}">${esc(g.featured?t("unfeature"):t("feature"))}</button>`:""}
+        </div>
+
+        <h3 style="font-size:1.15rem;margin:26px 0 4px">${esc(t("comments"))}</h3>
+        ${S.user?`<form data-cform="game:${g.id}" style="display:flex;gap:9px;align-items:center;margin:14px 0">
+          ${avatar(S.user.username,"sm")}
+          <input name="text" maxlength="500" placeholder="${esc(t("addComment"))}" required
+            style="flex:1;background:#0c0c12;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 13px">
+          <button class="btn btn-sm btn-red" type="submit">${esc(t("post"))}</button></form>`
+         :`<p style="color:var(--muted)"><button class="btn btn-sm btn-ghost" data-auth="login">${esc(t("login"))}</button></p>`}
+        <div>${cs.map(commentHTML).join("")||`<p class="rmeta" style="padding:8px 0">${esc(t("noComments"))}</p>`}</div>
+      </div>
+      <aside class="glass" style="padding:20px">
+        <h3 style="font-size:1.05rem;margin-bottom:10px">${esc(t("details"))}</h3>
+        <div class="kv"><span>${esc(t("category"))}</span><span>${esc(catName(g.category))}</span></div>
+        ${g.platform?`<div class="kv"><span>${esc(t("platform"))}</span><span>${esc(g.platform)}</span></div>`:""}
+        ${g.year?`<div class="kv"><span>${esc(t("year"))}</span><span>${esc(g.year)}</span></div>`:""}
+        <div class="kv"><span>${esc(t("likes"))}</span><span>${likeN(g)}</span></div>
+        <div class="kv"><span>${esc(t("comments"))}</span><span>${cs.length}</span></div>
+        <div class="kv"><span>${esc(t("views"))}</span><span>${g.views||0}</span></div>
+        <div class="kv"><span>${esc(t("author"))}</span><span>${esc(g.author)}</span></div>
+        ${safeUrl(g.link)?`<div class="kv"><span>${esc(t("link"))}</span><span>${esc(host(g.link))}</span></div>`:""}
+      </aside>
+    </div></section>`;
+}
+
+function coverUploadHTML(){
+  const c=S.addCover;
+  const img = c.preview || c.url;
+  return `<div class="field">
+    <label>${esc(t("cover"))}</label>
+    <div class="cover-drop ${img?"has-img":""}">
+      ${img?`
+        <img src="${esc(img)}" alt="" class="cover-preview" onerror="this.style.display='none'">
+        ${c.uploading?`<div class="cover-overlay"><div class="spinner sm"></div><span>${esc(t("uploading"))}</span></div>`:""}
+        <div class="cover-actions">
+          <button type="button" class="btn btn-sm" id="gf-upload">${esc(t("replaceImage"))}</button>
+          <button type="button" class="btn btn-sm btn-danger" data-removecover>${esc(t("removeImage"))}</button>
+        </div>`
+      :`<button type="button" class="cover-pick" id="gf-upload">
+          <svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M5 20h14a1 1 0 0 0 1-1V8.4a1 1 0 0 0-.3-.7l-4.4-4.4a1 1 0 0 0-.7-.3H5a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1Zm2-9 3 3.6L13 10l4 6H7l0-5ZM9 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"/></svg>
+          <b>${esc(t("chooseImage"))}</b><small>JPG · PNG · WEBP</small>
+        </button>`}
+    </div>
+    <input type="file" id="gf-file" accept="image/jpeg,image/png,image/webp,image/jpg" hidden>
+    ${c.error?`<p class="err" style="margin:0">${esc(c.error)}</p>`:""}
+  </div>`;
+}
+function gameFormHTML(g){
+  const v=(k,d)=>esc(g&&g[k]!=null?g[k]:(d||""));
+  return `<form class="form" id="game-form">
+    <div class="field"><label for="gf-title">${esc(t("title"))}</label>
+      <input id="gf-title" name="title" required maxlength="90" value="${v("title")}"></div>
+    <div class="field"><label for="gf-desc">${esc(t("description"))}</label>
+      <textarea id="gf-desc" name="description" maxlength="1200">${v("description")}</textarea></div>
+    ${coverUploadHTML()}
+    <div class="row3">
+      <div class="field"><label for="gf-cat">${esc(t("category"))}</label>
+        <select id="gf-cat" name="category">${CATS.map(c=>`<option value="${esc(c.id)}" ${g&&g.category===c.id?"selected":""}>${esc(c[LANG])}</option>`).join("")}</select></div>
+      <div class="field"><label for="gf-plat">${esc(t("platform"))}</label>
+        <select id="gf-plat" name="platform">${PLATFORMS.map(p=>`<option ${g&&g.platform===p?"selected":""}>${esc(p)}</option>`).join("")}</select></div>
+      <div class="field"><label for="gf-year">${esc(t("year"))}</label>
+        <input id="gf-year" name="year" type="number" min="1970" max="2100" value="${v("year")}"></div>
+    </div>
+    <div class="field"><label for="gf-link">${esc(t("link"))}</label>
+      <input id="gf-link" name="link" type="url" required value="${v("link")}" placeholder="https://"></div>
+    <div class="row2">
+      <div class="field"><label for="gf-official">${esc(t("officialWebsite"))}</label>
+        <input id="gf-official" name="official" type="url" value="${v("official")}" placeholder="https://"></div>
+      <div class="field"><label for="gf-source">${esc(t("externalSource"))}</label>
+        <input id="gf-source" name="source" type="url" value="${v("source")}" placeholder="https://"></div>
+    </div>
+    <div class="field"><label for="gf-trailer">${esc(t("trailer"))}</label>
+      <input id="gf-trailer" name="trailer" type="url" value="${v("trailer")}" placeholder="https://"></div>
+    <div class="field"><label for="gf-shots">${esc(t("screenshots"))}</label>
+      <input id="gf-shots" name="screenshots" value="${esc((g&&g.screenshots||[]).join(", "))}" placeholder="https://a.jpg, https://b.jpg">
+      <small>${esc(t("linksHint"))}</small></div>
+    <p class="err" id="gf-err"></p>
+    <div><button class="btn btn-red btn-lg" type="submit" ${S.addCover.uploading?"disabled":""}>${esc(g?t("saved"):(isAdmin()?t("adminAdd"):t("submit")))}</button></div>
+  </form>`;
+}
+
+function vAdd(){
+  if(!S.user) return `<section class="section wrap">${emptyBox(t("loginFirst"),t("loginFirstP"),
+    `<button class="btn btn-red" data-auth="login">${esc(t("login"))}</button> <button class="btn btn-ghost" data-auth="register">${esc(t("register"))}</button>`)}</section>`;
+  const g = S.editing ? gameById(S.editing) : null;
+  const mine = allGames().filter(x=>x.author===S.user.username && x.status!=="approved").sort(byNew);
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(g?t("edit"):t("addGame"))}</h2>
+      <p>${esc(isAdmin()?t("adminAddP"):t("userAddP"))}</p></div></div>
+    <div class="glass" style="padding:24px;max-width:780px">
+      <div class="note" style="margin-bottom:18px">${I.warn}<span><b>${esc(t("rules"))}.</b> ${esc(t("rulesP"))}</span></div>
+      ${gameFormHTML(g)}
+    </div>
+    ${mine.length?`<div style="margin-top:34px">
+      <div class="section-head"><div><h2><i></i>${esc(t("pending"))}</h2></div></div>
+      ${gamesGrid(mine)}</div>`:""}
+  </section>`;
+}
+
+function vCommunity(){
+  const sorters={newest:byNew,mostLiked:(a,b)=>likeN(b)-likeN(a)||byNew(a,b),mostCommented:(a,b)=>cFor("post",b.id).length-cFor("post",a.id).length||byNew(a,b)};
+  const list=posts().filter(matchPost).sort(sorters[S.feedTab]||byNew);
+  const top=usersAll().map(u=>({u,n:allGames().filter(g=>g.author===u.username&&g.status==="approved").length+posts().filter(p=>p.author===u.username).length}))
+    .filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,6);
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("community"))}</h2></div>
+      ${S.user?`<button class="btn btn-sm btn-red" data-modal="newpost">+ ${esc(t("newPost"))}</button>`
+              :`<button class="btn btn-sm btn-red" data-auth="login">${esc(t("login"))}</button>`}</div>
+    <div class="detail-split" style="margin-top:0">
+      <div>
+        <div class="tabs">
+          <button data-feed="newest" aria-selected="${S.feedTab==="newest"}">${esc(t("newest"))}</button>
+          <button data-feed="mostLiked" aria-selected="${S.feedTab==="mostLiked"}">${esc(t("mostLiked"))}</button>
+          <button data-feed="mostCommented" aria-selected="${S.feedTab==="mostCommented"}">${esc(t("mostCommented"))}</button>
+        </div>
+        <div class="feed">${list.map(postCard).join("")||emptyBox(t("emptyFeed"),t("emptyFeedP"),
+          S.user?`<button class="btn btn-red" data-modal="newpost">${esc(t("newPost"))}</button>`:"")}</div>
+      </div>
+      <aside style="display:grid;gap:18px">
+        <div class="glass" style="padding:20px">
+          <h3 style="font-size:1.05rem;margin-bottom:10px">${esc(t("contributors"))}</h3>
+          ${top.length?top.map(x=>`<button class="rank-item" data-profile="${esc(x.u.username)}">${avatar(x.u.username)}
+            <span style="flex:1;min-width:0"><span class="rn">${esc(x.u.username)}</span>
+            <span class="rmeta">${x.n} ${esc(t("posts").toLowerCase())}</span></span></button>`).join("")
+            :`<p class="rmeta" style="margin:0">${esc(t("nothingHere"))}</p>`}
+        </div>
+        <div class="glass" style="padding:20px">
+          <h3 style="font-size:1.05rem;margin-bottom:10px">${esc(t("trending"))}</h3>
+          ${libGames().sort(byHotG).slice(0,5).map((g,i)=>`<button class="rank-item" data-game="${g.id}">
+            <span class="rank-thumb">${coverHTML(g)}</span>
+            <span style="flex:1;min-width:0"><span class="rn">${esc(g.title)}</span>
+            <span class="rmeta">${likeN(g)} ♥ · ${cN("game",g)} 💬</span></span></button>`).join("")
+            ||`<p class="rmeta" style="margin:0">${esc(t("nothingHere"))}</p>`}
+        </div>
+      </aside>
+    </div></section>`;
+}
+
+function vSearch(){
+  const q=S.q.trim();
+  const gs=libGames().filter(matchGame).sort(byNew);
+  const ps=posts().filter(matchPost).sort(byNew);
+  const us=usersAll().filter(u=>!q||u.username.toLowerCase().includes(q.toLowerCase()));
+  const f=S.filter;
+  const none=!gs.length&&!ps.length&&!us.length;
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("search"))}</h2>
+      <p>${esc(t("resultsFor"))} “${esc(q)}”</p></div></div>
+    <div class="chips">
+      ${[["all","filterAll"],["games","filterGames"],["posts","filterPosts"],["users","filterUsers"]].map(([k,l])=>
+        `<button class="chip" data-filter="${k}" aria-pressed="${f===k}">${esc(t(l))}</button>`).join("")}
+    </div>
+    ${none?emptyBox(t("emptySearch"),t("emptySearchP"),""):""}
+    ${(f==="all"||f==="games")&&gs.length?`<div style="margin-bottom:34px">
+      <div class="section-head"><div><h2><i></i>${esc(t("games"))} (${gs.length})</h2></div></div>${gamesGrid(gs)}</div>`:""}
+    ${(f==="all"||f==="posts")&&ps.length?`<div style="margin-bottom:34px">
+      <div class="section-head"><div><h2><i></i>${esc(t("posts"))} (${ps.length})</h2></div></div>
+      <div class="feed">${ps.map(postCard).join("")}</div></div>`:""}
+    ${(f==="all"||f==="users")&&us.length?`<div>
+      <div class="section-head"><div><h2><i></i>${esc(t("users"))} (${us.length})</h2></div></div>
+      <div class="glass" style="padding:8px 20px">${us.map(u=>`<button class="rank-item" data-profile="${esc(u.username)}">
+        ${avatar(u.username)}<span style="flex:1;min-width:0"><span class="rn">${esc(u.username)}</span>
+        <span class="rmeta">${esc(roleFor(u.username).admin?t("administrator"):t("member"))} · ${esc(t("joined"))} ${ago(u.createdAt)}</span></span></button>`).join("")}</div></div>`:""}
+  </section>`;
+}
+
+function vProfile(){
+  const u=userByName(S.profile);
+  if(!u) return `<section class="section wrap">${emptyBox(t("emptySearch"),t("emptySearchP"),"")}</section>`;
+  const posted=allGames().filter(g=>g.author===u.username&&(g.status==="approved"||isAdmin()||(S.user&&S.user.username===u.username))).sort(byNew);
+  const liked=libGames().filter(g=>(g.likes||[]).includes(u.username)).sort(byNew);
+  const myPosts=posts().filter(p=>p.author===u.username).sort(byNew);
+  const cs=comments().filter(c=>c.author===u.username).sort(byNew).slice(0,10);
+  const urole=roleFor(u.username);
+  const isSelf = S.user&&S.user.username===u.username;
+  return `<section class="section wrap">
+    <div class="glass" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:22px;margin-bottom:26px">
+      ${avatar(u.username,"lg")}
+      <div style="flex:1;min-width:180px">
+        <h2 style="font-size:1.6rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap">${esc(u.username)}
+          ${urole.admin?`<span class="badge a">${esc(t("administrator"))}</span>`:""}
+          ${urole.banned?`<span class="badge r">${esc(t("ban"))}</span>`:""}</h2>
+        <p style="color:var(--muted);margin:5px 0 0;font-size:.92rem">${esc(t("joined"))} ${ago(u.createdAt)} ·
+          ${posted.length} ${esc(t("games").toLowerCase())} · ${myPosts.length} ${esc(t("posts").toLowerCase())}</p>
+      </div>
+      ${isSelf&&!urole.admin&&platformCanEdit?`<button class="btn btn-ghost" data-claimadmin>${esc(t("claimAdmin"))}</button>`:""}
+      ${S.user&&S.user.username===u.username?`<button class="btn btn-red" data-go="add">+ ${esc(t("addGame"))}</button>`:""}
+    </div>
+    <div class="section-head"><div><h2><i></i>${esc(t("myGames"))}</h2></div></div>
+    ${posted.length?gamesGrid(posted):emptyBox(t("nothingHere"),"","")}
+    <div class="section-head" style="margin-top:36px"><div><h2><i></i>${esc(t("myPosts"))}</h2></div></div>
+    <div class="feed">${myPosts.map(postCard).join("")||emptyBox(t("nothingHere"),"","")}</div>
+    <div class="section-head" style="margin-top:36px"><div><h2><i></i>${esc(t("myLikes"))}</h2></div></div>
+    ${liked.length?gamesGrid(liked):emptyBox(t("nothingHere"),"","")}
+    <div class="section-head" style="margin-top:36px"><div><h2><i></i>${esc(t("myComments"))}</h2></div></div>
+    <div class="glass" style="padding:8px 20px">${cs.length?cs.map(c=>{
+      const target=c.target==="game"?gameById(c.targetId):DATA.posts.get(c.targetId);
+      return `<div class="comment">${avatar(c.author,"sm")}<div class="comment-main">
+        <div class="comment-head"><b>${esc(target?(target.title||t("post")):"—")}</b><time>${ago(c.createdAt)}</time></div>
+        <p>${esc(c.text)}</p></div></div>`;}).join("")
+      :`<p class="rmeta" style="padding:10px 0;margin:0">${esc(t("nothingHere"))}</p>`}</div>
+  </section>`;
+}
+
+function vAdmin(){
+  if(!isAdmin()) return `<section class="section wrap">${emptyBox(t("adminsOnly"),t("adminsOnlyP"),
+    `<button class="btn btn-red" data-auth="login">${esc(t("login"))}</button>`)}</section>`;
+  const tabs=[["dashboard","dashboard"],["pending","pending"],["games","games"],["posts","posts"],["comments","comments"],["users","users"]];
+  const gs=allGames(), pend=gs.filter(g=>g.status==="pending");
+  let body="";
+  if(S.adminTab==="dashboard"){
+    const likes=gs.reduce((n,g)=>n+likeN(g),0)+posts().reduce((n,p)=>n+likeN(p),0)+comments().reduce((n,c)=>n+likeN(c),0);
+    body=`<div class="kpis">
+      ${[[usersAll().length,"totalUsers"],[gs.filter(g=>g.status==="approved").length,"totalGames"],
+         [pend.length,"pendingGames"],[posts().length,"totalPosts"],[comments().length,"totalComments"],[likes,"totalLikes"]]
+        .map(([n,k])=>`<div class="kpi"><b>${n}</b><small>${esc(t(k))}</small></div>`).join("")}</div>
+      <div class="glass" style="padding:20px">
+        <h3 style="font-size:1.05rem;margin-bottom:10px">${esc(t("featured"))}</h3>
+        ${gs.filter(g=>g.status==="approved").map(g=>`<div class="rank-item" style="cursor:default">
+          <span class="rank-thumb">${coverHTML(g)}</span>
+          <span style="flex:1;min-width:0"><span class="rn">${esc(g.title)}</span><span class="rmeta">${esc(catName(g.category))}</span></span>
+          <button class="btn btn-sm ${g.featured?"btn-red":""}" data-feature="${g.id}">${esc(g.featured?t("unfeature"):t("feature"))}</button>
+        </div>`).join("")||`<p class="rmeta" style="margin:0">${esc(t("emptyLib"))}</p>`}
+      </div>`;
+  }
+  if(S.adminTab==="pending"){
+    body=pend.length?`<div class="grid-games">${pend.map(g=>`<article class="card">
+      <div class="cover" data-game="${g.id}">${coverHTML(g)}<span class="pill cat">${esc(catName(g.category))}</span><span class="pill pend">${esc(t("pendingS"))}</span></div>
+      <div class="card-body"><h3 data-game="${g.id}">${esc(g.title)}</h3>
+        <div class="meta-row"><span>${esc(g.platform||"—")}</span><span>${esc(g.year||"—")}</span></div>
+        <p class="desc">${esc(g.description||"")}</p>
+        <div class="byline">${avatar(g.author,"sm")}<b>${esc(g.author)}</b><span>·</span><span>${ago(g.createdAt)}</span></div>
+        ${safeUrl(g.link)?`<div class="rmeta" style="overflow-wrap:anywhere">${esc(g.link)}</div>`:""}
+        <div class="card-foot" style="gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-ok" data-approve="${g.id}">${esc(t("approve"))}</button>
+          <button class="btn btn-sm" data-editgame="${g.id}">${esc(t("edit"))}</button>
+          <button class="btn btn-sm btn-danger" data-reject="${g.id}">${esc(t("reject"))}</button>
+          <button class="btn btn-sm btn-danger" data-delgame="${g.id}">${esc(t("del"))}</button>
+        </div></div></article>`).join("")}</div>`
+      :emptyBox(t("noPending"),"","");
+  }
+  if(S.adminTab==="games"){
+    body=`<div class="glass" style="padding:16px"><div class="scrollx"><table class="tbl">
+      <thead><tr><th>${esc(t("game"))}</th><th>${esc(t("author"))}</th><th>${esc(t("category"))}</th><th>${esc(t("status"))}</th><th>${esc(t("actions"))}</th></tr></thead><tbody>
+      ${gs.sort(byNew).map(g=>`<tr>
+        <td><button class="rn" data-game="${g.id}" style="max-width:220px">${esc(g.title)}</button></td>
+        <td style="color:var(--muted)">${esc(g.author)}</td>
+        <td style="color:var(--muted)">${esc(catName(g.category))}</td>
+        <td><span class="badge ${g.status==="approved"?"o":g.status==="rejected"?"r":"p"}">${esc(g.status==="approved"?t("approvedS"):g.status==="rejected"?t("rejectedS"):t("pendingS"))}</span>
+          ${g.featured?`<span class="badge p">FEATURED</span>`:""}</td>
+        <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${g.status!=="approved"?`<button class="btn btn-sm btn-ok" data-approve="${g.id}">${esc(t("approve"))}</button>`:""}
+          <button class="btn btn-sm" data-editgame="${g.id}">${esc(t("edit"))}</button>
+          <button class="btn btn-sm" data-feature="${g.id}">${esc(g.featured?t("unfeature"):t("feature"))}</button>
+          <button class="btn btn-sm btn-danger" data-delgame="${g.id}">${esc(t("del"))}</button>
+        </div></td></tr>`).join("")||`<tr><td colspan="5" class="rmeta">${esc(t("emptyLib"))}</td></tr>`}
+      </tbody></table></div></div>`;
+  }
+  if(S.adminTab==="posts"){
+    body=`<div class="feed">${posts().sort(byNew).map(p=>`<div class="post">
+      <div class="post-head">${avatar(p.author,"sm")}<b style="font-family:var(--font-ui);font-size:.92rem">${esc(p.author)}</b>
+        <span class="rmeta">${ago(p.createdAt)}</span><span class="ptype">${esc(ptypeName(p.type))}</span></div>
+      ${p.title?`<h3>${esc(p.title)}</h3>`:""}<p class="body">${esc(p.body||"")}</p>
+      <div class="post-foot"><button class="btn btn-sm btn-danger" data-delpost="${p.id}">${esc(t("del"))}</button></div>
+      </div>`).join("")||emptyBox(t("emptyFeed"),"","")}</div>`;
+  }
+  if(S.adminTab==="comments"){
+    body=`<div class="glass" style="padding:8px 20px">${comments().sort(byNew).slice(0,60).map(c=>{
+      const tg=c.target==="game"?gameById(c.targetId):DATA.posts.get(c.targetId);
+      return `<div class="comment">${avatar(c.author,"sm")}<div class="comment-main">
+        <div class="comment-head"><b>${esc(c.author)}</b><time>${ago(c.createdAt)}</time>
+          <span class="rmeta">${esc(tg?(tg.title||t("post")):"—")}</span></div>
+        <p>${esc(c.text)}</p>
+        <button class="btn btn-sm btn-danger" data-delcomment="${c.id}">${esc(t("del"))}</button>
+      </div></div>`;}).join("")||`<p class="rmeta" style="padding:10px 0">${esc(t("nothingHere"))}</p>`}</div>`;
+  }
+  if(S.adminTab==="users"){
+    body=`${!platformCanEdit?`<div class="note info" style="margin-bottom:16px">${I.warn}<span>${esc(t("noEditGrantNote"))}</span></div>`:""}
+      <div class="glass" style="padding:16px"><div class="scrollx"><table class="tbl">
+      <thead><tr><th>${esc(t("username"))}</th><th>${esc(t("joined"))}</th><th>${esc(t("games"))}</th><th>${esc(t("status"))}</th><th>${esc(t("actions"))}</th></tr></thead><tbody>
+      ${usersAll().sort((a,b)=>a.createdAt-b.createdAt).map(u=>{const ur=roleFor(u.username); return `<tr>
+        <td><button class="rn" data-profile="${esc(u.username)}">${esc(u.username)}</button></td>
+        <td class="rmeta">${ago(u.createdAt)}</td>
+        <td style="color:var(--muted)">${allGames().filter(g=>g.author===u.username).length}</td>
+        <td>${ur.admin?`<span class="badge a">${esc(t("administrator"))}</span>`:`<span class="badge n">${esc(t("member"))}</span>`}
+            ${ur.banned?`<span class="badge r">${esc(t("ban"))}</span>`:""}</td>
+        <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm" data-togadmin="${esc(u.username)}">${ur.admin?"− "+esc(t("administrator")):"+ "+esc(t("administrator"))}</button>
+          ${S.user.username===u.username?"":`<button class="btn btn-sm btn-danger" data-ban="${esc(u.username)}">${esc(ur.banned?t("unban"):t("ban"))}</button>
+          <button class="btn btn-sm btn-danger" data-deluser="${esc(u.username)}">${esc(t("del"))}</button>`}
+        </div></td></tr>`;}).join("")}
+      </tbody></table></div></div>`;
+  }
+  return `<section class="section wrap">
+    <div class="section-head"><div><h2><i></i>${esc(t("admin"))}</h2><p>${esc(t("dashboard"))}</p></div>
+      <button class="btn btn-sm btn-red" data-go="add">+ ${esc(t("adminAdd"))}</button></div>
+    <div class="tabs">${tabs.map(([k,l])=>`<button data-atab="${k}" aria-selected="${S.adminTab===k}">${esc(t(l))}${k==="pending"&&pend.length?` (${pend.length})`:""}</button>`).join("")}</div>
+    ${body}</section>`;
+}
+
+/* ========================= modals ========================= */
+function renderModal(){
+  const root=document.getElementById("modal-root");
+  if(!modal){ root.innerHTML=""; return; }
+  let inner="";
+  if(modal==="login"||modal==="register"){
+    const reg=modal==="register";
+    inner=`<div class="modal"><div class="modal-head"><h3>${esc(reg?t("register"):t("login"))}</h3>
+      <button class="x" data-close>${I.x}</button></div><div class="modal-body">
+      <form class="form" id="auth-form">
+        <div class="field"><label for="a-user">${esc(t("username"))}</label><input id="a-user" required maxlength="20" autocomplete="username"></div>
+        <div class="field"><label for="a-pass">${esc(t("password"))}</label>
+          <input id="a-pass" type="password" required minlength="6" autocomplete="${reg?"new-password":"current-password"}">
+          ${reg?`<small>${esc(t("regHint"))}</small>`:""}</div>
+        <p class="err" id="a-err"></p>
+        <button class="btn btn-red btn-lg" type="submit">${esc(reg?t("register"):t("login"))}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-auth="${reg?"login":"register"}">${esc(reg?t("login"):t("register"))}</button>
+      </form></div></div>`;
+  }
+  if(modal==="newpost"){
+    inner=`<div class="modal wide"><div class="modal-head"><h3>${esc(t("newPost"))}</h3>
+      <button class="x" data-close>${I.x}</button></div><div class="modal-body">
+      <form class="form" id="post-form">
+        <div class="row2">
+          <div class="field"><label for="p-type">${esc(t("postType"))}</label>
+            <select id="p-type">${PTYPES.map(p=>`<option value="${p.id}">${esc(t(p.key))}</option>`).join("")}</select></div>
+          <div class="field"><label for="p-game">${esc(t("game"))}</label>
+            <select id="p-game"><option value="">—</option>${libGames().sort(byNew).map(g=>`<option value="${g.id}">${esc(g.title)}</option>`).join("")}</select></div>
+        </div>
+        <div class="field"><label for="p-title">${esc(t("postTitle"))}</label><input id="p-title" maxlength="120"></div>
+        <div class="field"><label for="p-body">${esc(t("postBody"))}</label><textarea id="p-body" required maxlength="2000"></textarea></div>
+        <div class="field"><label for="p-img">${esc(t("screenshots"))}</label><input id="p-img" type="url" placeholder="https://"></div>
+        <p class="err" id="p-err"></p>
+        <button class="btn btn-red btn-lg" type="submit">${esc(t("post"))}</button>
+      </form></div></div>`;
+  }
+  if(modal==="settings"){
+    inner=`<div class="modal"><div class="modal-head"><h3>${esc(t("settings"))}</h3>
+      <button class="x" data-close>${I.x}</button></div><div class="modal-body">
+      <div class="field"><label>${esc(t("langNote"))}</label>
+        <div class="chips" style="margin:0">
+          <button class="chip" data-lang="en" aria-pressed="${LANG==="en"}">English</button>
+          <button class="chip" data-lang="ka" aria-pressed="${LANG==="ka"}">ქართული</button></div></div>
+      ${S.user?`<div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn btn-ghost" data-profile="${esc(S.user.username)}">${esc(t("profile"))}</button>
+        <button class="btn btn-danger" data-logout>${esc(t("logout"))}</button></div>`:""}
+      </div></div>`;
+  }
+  if(modal==="confirm"){
+    inner=`<div class="modal sm" role="alertdialog" aria-modal="true" aria-describedby="confirm-msg">
+      <div class="modal-body" style="padding-top:24px">
+        <p id="confirm-msg" style="margin:0 0 20px;font-size:1.02rem;color:var(--text)">${esc(confirmMsg)}</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-ghost" data-confirmno autofocus>${esc(t("cancel"))}</button>
+          <button class="btn btn-danger" data-confirmyes>${esc(t("del"))}</button>
+        </div>
+      </div></div>`;
+  }
+  if(modal==="notes"){
+    const list=myNotifications();
+    inner=`<div class="modal"><div class="modal-head"><h3>${esc(t("notifications"))}</h3>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${list.length?`<button class="btn btn-sm btn-ghost" data-clearnotes>${esc(t("clearAll"))}</button>`:""}
+        <button class="x" data-close>${I.x}</button></div></div>
+      <div class="modal-body" style="padding:6px 14px 16px">
+        ${list.length?list.map(notifRow).join(""):`<p class="rmeta" style="padding:18px 6px">${esc(t("nothingNew"))}</p>`}
+      </div></div>`;
+  }
+  root.innerHTML=`<div class="overlay" data-overlay>${inner}</div>`;
+  const f=root.querySelector("input,textarea,select"); if(f) setTimeout(()=>f.focus(),40);
+}
+
+/* ========================= render ========================= */
+function render(){
+  if(!ready) return;
+  chrome();
+  const map={home:vHome,games:vGames,categories:vCategories,game:vGame,add:vAdd,community:vCommunity,
+             search:vSearch,profile:vProfile,admin:vAdmin};
+  document.getElementById("app").innerHTML=(map[S.view]||vHome)();
+  renderModal();
+}
+function go(view,opt){
+  opt=opt||{};
+  if(view==="me"&&S.user){ view="profile"; opt.profile=S.user.username; }
+  if(opt.profile) S.profile=opt.profile;
+  if(opt.game) S.game=opt.game;
+  if(opt.cat!=null) S.cat=opt.cat;
+  if(opt.tab) S.adminTab=opt.tab;
+  if(view==="add" && !opt.keepEditing){ S.editing=null; S.addCover={url:"",preview:"",uploading:false,error:""}; }
+  if(view!=="add") S.editing=null;
+  S.view=view;
+  document.getElementById("topbar").classList.remove("drawer-open");
+  document.getElementById("burger").setAttribute("aria-expanded","false");
+  window.scrollTo({top:0,behavior:"instant"});
+  render();
+}
+async function openGamePage(id){
+  const g=gameById(id); if(!g) return;
+  const key="gt_seen_"+id;
+  if(!sessionStorage.getItem(key)){
+    sessionStorage.setItem(key,"1");
+    put("games",id,{...g,views:(g.views||0)+1}).catch(()=>{});
+  }
+  go("game",{game:id});
+}
+
+/* ========================= actions ========================= */
+function requireUser(){ if(!S.user){ modal="login"; renderModal(); return false; } return true; }
+function askConfirm(msg){
+  return new Promise(resolve=>{
+    confirmMsg = msg; confirmResolve = resolve; modal = "confirm"; renderModal();
+  });
+}
+async function toggleLike(coll,id,btn){
+  if(!requireUser()) return;
+  const o=DATA[coll].get(id); if(!o) return;
+  const wasLiked = (o.likes||[]).includes(S.user.username);
+  const s=new Set(o.likes||[]);
+  wasLiked?s.delete(S.user.username):s.add(S.user.username);
+  if(btn){ btn.classList.add("pop"); setTimeout(()=>btn.classList.remove("pop"),450); }
+  try{
+    await put(coll,id,{...o,likes:[...s]});
+    if(!wasLiked) notifyLike(coll,id,S.user.username).catch(()=>{});
+  }catch(err){ /* put() already rolled back and toasted */ }
+}
+async function delGame(id){
+  const g=gameById(id); if(!g) return;
+  if(!(S.user&&(isAdmin()||S.user.username===g.author))) return;
+  const ok = await askConfirm(t("confirmDel"));
+  if(!ok) return;
+  try{
+    for(const c of cFor("game",id)) await remove("comments",c.id);
+    for(const n of [...DATA.notifications.values()].filter(n=>n.gameId===id)) await remove("notifications",n.id);
+    await remove("games",id);
+    if(S.view==="game"&&S.game===id) go("games"); else render();
+    toast(t("deleted"));
+  }catch(err){ /* remove() already rolled back and toasted */ }
+}
+async function delPost(id){
+  const p=DATA.posts.get(id); if(!p) return;
+  if(!(S.user&&(isAdmin()||S.user.username===p.author))) return;
+  const ok = await askConfirm(t("confirmDel"));
+  if(!ok) return;
+  try{
+    for(const c of cFor("post",id)) await remove("comments",c.id);
+    await remove("posts",id);
+    toast(t("deleted"));
+  }catch(err){ /* remove() already rolled back and toasted */ }
+}
+async function delComment(id){
+  const c=DATA.comments.get(id); if(!c) return;
+  if(!(S.user&&(isAdmin()||S.user.username===c.author))) return;
+  try{ await remove("comments",id); toast(t("deleted")); }catch(err){ /* rolled back and toasted */ }
+}
+async function setStatus(id,status){
+  if(!isAdmin()) return;
+  const g=gameById(id); if(!g) return;
+  const wasApproved = g.status==="approved";
+  try{
+    await put("games",id,{...g,status,approvedAt:status==="approved"?Date.now():g.approvedAt});
+    notifyGameStatus(g,status,S.user.username).catch(()=>{});
+    if(status==="approved"&&!wasApproved) notifyNewGame(g).catch(()=>{});
+    toast(status==="approved"?t("approved"):t("rejected"));
+  }catch(err){ /* rolled back and toasted */ }
+}
+async function toggleFeature(id){
+  if(!isAdmin()) return;
+  const g=gameById(id); if(!g) return;
+  try{ await put("games",id,{...g,featured:!g.featured,status:"approved"}); toast(t("saved")); }
+  catch(err){ /* rolled back and toasted */ }
+}
+async function toggleAdmin(name){
+  if(!isAdmin()) return;
+  const u=userByName(name); if(!u) return;
+  const key=u.username.toLowerCase(), cur=roleFor(u.username);
+  if(S.user.username===u.username && cur.admin){ toast(t("demoteSelf")); return; }
+  try{ await put("roles",key,{...cur,admin:!cur.admin}); toast(t("saved")); }
+  catch(err){ toast(t("adminWriteBlocked")); }
+}
+async function toggleBan(name){
+  if(!isAdmin()) return;
+  const u=userByName(name); if(!u||u.username===S.user.username) return;
+  const key=u.username.toLowerCase(), cur=roleFor(u.username);
+  try{ await put("roles",key,{...cur,banned:!cur.banned}); toast(t("saved")); }
+  catch(err){ toast(t("adminWriteBlocked")); }
+}
+async function claimFirstAdmin(){
+  if(!S.user) return;
+  const key=S.user.username.toLowerCase(), cur=roleFor(S.user.username);
+  try{ await put("roles",key,{...cur,admin:true}); toast(t("claimedAdmin")); }
+  catch(err){ toast(t("adminWriteBlocked")); }
+}
+async function delUser(name){
+  if(!isAdmin()) return;
+  const u=userByName(name); if(!u||u.username===S.user.username) return;
+  const ok = await askConfirm(t("confirmDel"));
+  if(!ok) return;
+  try{
+    for(const g of allGames().filter(g=>g.author===u.username)){
+      for(const c of cFor("game",g.id)) await remove("comments",c.id);
+      await remove("games",g.id);
+    }
+    for(const p of posts().filter(p=>p.author===u.username)){
+      for(const c of cFor("post",p.id)) await remove("comments",c.id);
+      await remove("posts",p.id);
+    }
+    for(const c of comments().filter(c=>c.author===u.username)) await remove("comments",c.id);
+    for(const n of [...DATA.notifications.values()].filter(n=>n.userId===u.username.toLowerCase())) await remove("notifications",n.id);
+    await remove("users",u.username.toLowerCase());
+    toast(t("deleted"));
+  }catch(err){ /* remove() already rolled back and toasted */ }
+}
+
+/* ========================= events ========================= */
+document.addEventListener("click", async e=>{
+  const sel="[data-go],[data-auth],[data-close],[data-overlay],[data-modal],[data-logout],[data-lang],[data-game],[data-profile],[data-cat],[data-cat-page],[data-filter],[data-feed],[data-atab],[data-like],[data-plike],[data-clike],[data-delgame],[data-delpost],[data-delcomment],[data-approve],[data-reject],[data-feature],[data-editgame],[data-togadmin],[data-ban],[data-deluser],[data-pcomments],[data-share],[data-note],[data-confirmyes],[data-confirmno],[data-delnote],[data-clearnotes],[data-removecover]";
+  const el=e.target.closest(sel);
+  if(!el) return;
+  const d=el.dataset;
+  if(d.confirmyes!==undefined){ const r=confirmResolve; confirmResolve=null; modal=null; renderModal(); if(r) r(true); return; }
+  if(d.confirmno!==undefined){ const r=confirmResolve; confirmResolve=null; modal=null; renderModal(); if(r) r(false); return; }
+  if(d.overlay!==undefined && el===e.target){
+    if(modal==="confirm"){ const r=confirmResolve; confirmResolve=null; modal=null; renderModal(); if(r) r(false); return; }
+    modal=null; renderModal(); return;
+  }
+  if(d.overlay!==undefined) return;
+  if(d.close!==undefined){
+    if(modal==="confirm"){ const r=confirmResolve; confirmResolve=null; modal=null; renderModal(); if(r) r(false); return; }
+    modal=null; renderModal(); return;
+  }
+  if(d.lang){ LANG=d.lang; localStorage.setItem("gt_lang",LANG); render(); return; }
+  if(d.go!==undefined){ modal=null; go(d.go); return; }
+  if(d.auth){ modal=d.auth; renderModal(); return; }
+  if(d.modal){
+    modal=d.modal;
+    if(d.modal==="notes"){ renderModal(); markAllNotificationsRead(); return; }
+    renderModal(); return;
+  }
+  if(d.logout!==undefined){ setSession(null); modal=null; if(S.view==="admin"||S.view==="add") S.view="home"; toast(t("loggedOut")); render(); return; }
+  if(d.game){ modal=null; openGamePage(d.game); return; }
+  if(d.profile){ modal=null; go("profile",{profile:d.profile}); return; }
+  if(d.catPage){ go("games",{cat:d.catPage}); return; }
+  if(d.cat){ S.cat=d.cat; render(); return; }
+  if(d.filter){ S.filter=d.filter; render(); return; }
+  if(d.feed){ S.feedTab=d.feed; render(); return; }
+  if(d.atab){ S.adminTab=d.atab; render(); return; }
+  if(d.like){ await toggleLike("games",d.like,el); return; }
+  if(d.plike){ await toggleLike("posts",d.plike,el); return; }
+  if(d.clike){ await toggleLike("comments",d.clike,el); return; }
+  if(d.pcomments){ S.openPost = S.openPost===d.pcomments?null:d.pcomments; render(); return; }
+  if(d.share){ const p=DATA.posts.get(d.share); const url=location.href.split("#")[0]+"#post-"+d.share;
+    try{ await navigator.clipboard.writeText(url); toast(t("share")+" ✓"); }catch(err){ toast(url); } return; }
+  if(d.delgame){ await delGame(d.delgame); return; }
+  if(d.delpost){ await delPost(d.delpost); return; }
+  if(d.delcomment){ await delComment(d.delcomment); return; }
+  if(d.approve){ await setStatus(d.approve,"approved"); return; }
+  if(d.reject){ await setStatus(d.reject,"rejected"); return; }
+  if(d.feature){ await toggleFeature(d.feature); return; }
+  if(d.editgame){ S.editing=d.editgame; const g=gameById(d.editgame);
+    S.addCover={url:g&&g.cover||"",preview:g&&g.cover||"",uploading:false,error:""};
+    modal=null; go("add",{keepEditing:true}); return; }
+  if(d.togadmin){ await toggleAdmin(d.togadmin); return; }
+  if(d.ban){ await toggleBan(d.ban); return; }
+  if(d.deluser){ await delUser(d.deluser); return; }
+  if(d.note){ try{ const g=JSON.parse(d.note); modal=null; if(g.view==="game"&&g.id) openGamePage(g.id); else go(g.view||"home",{tab:g.tab}); }catch(err){} return; }
+  if(d.delnote){ try{ await remove("notifications",d.delnote); }catch(err){} return; }
+  if(d.clearnotes!==undefined){
+    for(const n of myNotifications()){ try{ await remove("notifications",n.id); }catch(err){} }
+    return;
+  }
+  if(d.removecover!==undefined){ S.addCover={url:"",preview:"",uploading:false,error:""}; render(); return; }
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    if(modal==="confirm"){ const r=confirmResolve; confirmResolve=null; modal=null; renderModal(); if(r) r(false); return; }
+    modal=null; renderModal();
+  }
+});
+
+
+document.getElementById("burger").addEventListener("click",()=>{
+  const bar=document.getElementById("topbar");
+  const open=bar.classList.toggle("drawer-open");
+  document.getElementById("burger").setAttribute("aria-expanded",String(open));
+});
+const qEl=document.getElementById("q");
+qEl.addEventListener("input",()=>{
+  S.q=qEl.value;
+  S.view = S.q.trim() ? "search" : (S.view==="search"?"games":S.view);
+  render();
+  const n=document.getElementById("q"); if(n){ n.value=S.q; n.focus(); }
+});
+
+document.addEventListener("submit", async e=>{
+  const form=e.target;
+
+  if(form.id==="auth-form"){
+    e.preventDefault();
+    const name=document.getElementById("a-user").value.trim();
+    const pass=document.getElementById("a-pass").value;
+    const err=document.getElementById("a-err");
+    if(!/^[a-zA-Z0-9_.-]{3,20}$/.test(name)){ err.textContent=t("badName"); return; }
+    const key=name.toLowerCase(), ex=userByName(key), hash=await sha(pass);
+    if(modal==="register"){
+      if(ex){ err.textContent=t("taken"); return; }
+      const u={username:name,pass:hash,createdAt:Date.now()};
+      await put("users",key,u); setSession(u);
+      toast(t("welcome"));
+    }else{
+      if(!ex||ex.pass!==hash){ err.textContent=t("badLogin"); return; }
+      if(roleFor(key).banned){ err.textContent=t("banned"); return; }
+      setSession(ex); toast(t("welcome"));
+    }
+    modal=null; render(); return;
+  }
+
+  if(form.id==="game-form"){
+    e.preventDefault();
+    if(!S.user) return;
+    const err=document.getElementById("gf-err");
+    const val=n=>{ const el=form.querySelector(`[name="${n}"]`); return el?el.value.trim():""; };
+    const title=val("title"), link=safeUrl(val("link"));
+    if(!title){ err.textContent=t("needName"); return; }
+    if(!link){ err.textContent=t("needLink"); return; }
+    if(S.addCover.uploading){ err.textContent=t("waitForUpload"); return; }
+    err.textContent="";
+    const shots=val("screenshots").split(",").map(s=>safeUrl(s)).filter(Boolean);
+    const prev=S.editing?gameById(S.editing):null;
+    const id=prev?prev.id:uid();
+    const admin=isAdmin();
+    const wasApproved = prev && prev.status==="approved";
+    const rec={
+      id, title, link,
+      official:safeUrl(val("official"))||"", source:safeUrl(val("source"))||"", trailer:safeUrl(val("trailer"))||"",
+      cover:S.addCover.url||"",
+      screenshots:shots, description:val("description"), category:val("category"),
+      platform:val("platform"), year:val("year"),
+      author:prev?prev.author:S.user.username,
+      createdAt:prev?prev.createdAt:Date.now(), updatedAt:Date.now(),
+      likes:prev?prev.likes||[]:[], views:prev?prev.views||0:0,
+      featured:prev?!!prev.featured:false,
+      status: prev ? (admin?"approved":prev.status) : (admin?"approved":"pending"),
+      approvedAt: prev?prev.approvedAt:(admin?Date.now():null)
+    };
+    try{
+      await put("games",id,rec);
+      S.editing=null; S.addCover={url:"",preview:"",uploading:false,error:""};
+      if(rec.status==="approved"){
+        toast(prev?t("saved"):t("published"));
+        if(!wasApproved) notifyNewGame(rec).catch(()=>{});
+        openGamePage(id);
+      }else{ toast(t("submitted")); go("add"); }
+    }catch(err2){ err.textContent=t("actionFailed"); }
+    return;
+  }
+
+  if(form.id==="post-form"){
+    e.preventDefault();
+    if(!S.user) return;
+    const errEl=document.getElementById("p-err");
+    const body=document.getElementById("p-body").value.trim();
+    if(!body){ errEl.textContent=t("needBody"); return; }
+    const id=uid();
+    try{
+      await put("posts",id,{id,type:document.getElementById("p-type").value,
+        title:document.getElementById("p-title").value.trim(),
+        body, image:safeUrl(document.getElementById("p-img").value)||"",
+        gameId:document.getElementById("p-game").value||"",
+        author:S.user.username,createdAt:Date.now(),likes:[]});
+      modal=null; toast(t("published")); go("community");
+    }catch(err2){ errEl.textContent=t("actionFailed"); }
+    return;
+  }
+
+  if(form.dataset.cform){
+    e.preventDefault();
+    if(!S.user) return;
+    const [kind,tid]=form.dataset.cform.split(":");
+    const input=form.querySelector('[name="text"]');
+    const text=input.value.trim(); if(!text) return;
+    input.value="";
+    const id=uid();
+    try{
+      await put("comments",id,{id,target:kind,targetId:tid,author:S.user.username,text,createdAt:Date.now(),likes:[]});
+      notifyComment(kind,tid,id,S.user.username).catch(()=>{});
+    }catch(err2){ input.value=text; toast(t("actionFailed")); }
+    return;
+  }
+});
+
+/* cover upload */
+document.addEventListener("click",e=>{ if(e.target.id==="gf-upload"){ const f=document.getElementById("gf-file"); if(f) f.click(); } });
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg","image/png","image/webp"];
+const MAX_COVER_BYTES = 12*1024*1024; /* 12MB, comfortably under the 20MiB asset cap */
+document.addEventListener("change", async e=>{
+  if(e.target.id!=="gf-file") return;
+  const file=e.target.files&&e.target.files[0];
+  e.target.value="";
+  if(!file) return;
+
+  if(!ACCEPTED_IMAGE_TYPES.includes(file.type)){
+    S.addCover={...S.addCover,error:t("invalidImageType")}; render(); return;
+  }
+  if(file.size>MAX_COVER_BYTES){
+    S.addCover={...S.addCover,error:t("imageTooLarge")}; render(); return;
+  }
+
+  /* instant local preview while the real upload runs in the background */
+  const reader=new FileReader();
+  reader.onload=()=>{
+    S.addCover={url:"",preview:String(reader.result),uploading:true,error:""};
+    render();
+    doUpload(file);
+  };
+  reader.onerror=()=>{ S.addCover={...S.addCover,error:t("uploadFail"),uploading:false}; render(); };
+  reader.readAsDataURL(file);
+});
+async function doUpload(file){
+  if(!assets){
+    S.addCover={...S.addCover,uploading:false,error:t("uploadNA")}; render(); return;
+  }
+  try{
+    const r=await assets.upload(file);
+    /* the preview snapshot may have been cleared/replaced while this ran; only
+       apply the result if the form is still waiting on this same upload */
+    if(S.addCover.uploading) S.addCover={url:r.url,preview:r.url,uploading:false,error:""};
+    render();
+  }catch(err){
+    S.addCover={...S.addCover,uploading:false,error:t("uploadFail")}; render();
+  }
+}
+
+/* ========================= boot ========================= */
+function waitForClaude(){
+  return new Promise(res=>{
+    if(window.claude&&window.claude.use) return res(window.claude);
+    let n=0; const iv=setInterval(()=>{
+      if(window.claude&&window.claude.use){ clearInterval(iv); res(window.claude); }
+      else if(++n>60){ clearInterval(iv); res(null); }
+    },100);
+  });
+}
+async function cleanupLegacy(){
+  /* removes only the old auto-imported v1 entries, never library records */
+  for(const g of allGames()) if(/^seed-\d+$/.test(String(g.id||""))) await remove("games",g.id);
+  const legacy=DATA.users.get("gametime");
+  if(legacy&&legacy.seeded) await remove("users","gametime");
+  for(const [id,g] of DATA.games){
+    if(g&&g.name&&!g.title) await put("games",id,{...g,title:g.name,status:g.status||"approved"});
+  }
+}
+/* Removes the previously auto-created library entries (by stable id)
+   and their comments, once. Never recreates or imports anything. Safe
+   to run on every load: once removed, these ids simply stay absent. */
+async function seedLibrary(){
+  for(const id of REMOVED_SEED_IDS){
+    if(DATA.games.has(id)){
+      for(const c of cFor("game",id)) await remove("comments",c.id);
+      await remove("games",id);
+    }
+  }
+  const legacyAuthor = DATA.users.get("gametime");
+  if(legacyAuthor && legacyAuthor.official && !allGames().some(g=>g.author===SEED_AUTHOR)){
+    await remove("users","gametime");
+  }
+}
+const SEED_AUTHOR = "GameTime";
+function syncUser(){
+  if(!S.user) return;
+  const f=userByName(S.user.username);
+  if(!f||roleFor(S.user.username).banned){ setSession(null); } else S.user=f;
+}
+async function boot(){
+  const c=await waitForClaude();
+  if(c){ try{ db=await c.use("db"); }catch(err){ db=null; }
+         try{ assets=await c.use("assets"); }catch(err){ assets=null; } }
+  if(db){
+    let seen=0; const colls=["games","posts","comments","users","notifications"];
+    colls.forEach(coll=>{
+      db.collection(coll).onSnapshot(snap=>{
+        DATA[coll].clear();
+        snap.docs.forEach(doc=>{ const v=doc.data(); if(v) DATA[coll].set(doc.id,v); });
+        seen++;
+        if(!ready&&seen>=colls.length){ ready=true; loadSession();
+          cleanupLegacy().then(seedLibrary).catch(()=>{}); }
+        else syncUser();
+        if(ready) render();
+      },()=>{ if(!ready){ ready=true; lsLoad(); loadSession(); render(); } });
+    });
+    setTimeout(()=>{ if(!ready){ ready=true; loadSession(); render(); } },5000);
+  }else{
+    lsLoad(); ready=true; loadSession(); await cleanupLegacy(); await seedLibrary(); render();
+  }
+}
+chrome(); boot();
+})();
+</script>
+</body>
+</html>
